@@ -136,11 +136,7 @@ and delegate estimation of the model coefficients to existing tools like
 normalization step of their workflows).</p>
 <p><code>disize</code> uses Stan’s <a href="https://mc-stan.org/docs/reference-manual/optimization.html" class="external-link">L-BFGS
 optimization algorithm</a> to find the model’s <em>maximum a
-posteriori</em> (MAP) for <span class="math inline">\mathbf{s}</span>.
-We end up doing this in fewer iterations than needed for all parameters
-to converge by using a heuristic to guess how long the procedure should
-run for; this is followed up with a diagnostic to ensure the size
-factors have converged.</p>
+posteriori</em> (MAP) for <span class="math inline">\mathbf{s}</span>.</p>
 </div>
   </main>
 </div>
