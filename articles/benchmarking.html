@@ -154,7 +154,7 @@ varying the above parameters and then simulate a dataset corresponding
 to a given scenario:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Simulate a single dataset given its settings</span></span>
-<span><span class="va">simulate_dataset</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">design_formula</span>, <span class="va">metadata</span>, <span class="va">n_genes</span>, <span class="va">sparsity</span>, <span class="va">mgt</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="va">simulate_dataset</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">design_formula</span>, <span class="va">metadata</span>, <span class="va">n_genes</span>, <span class="va">sparsity</span>, <span class="va">mgt</span>, <span class="va">avg</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="co"># Simulate inverse overdispersion factors</span></span>
 <span>    <span class="va">iodisps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Lognormal.html" class="external-link">rlnorm</a></span><span class="op">(</span><span class="va">n_genes</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, <span class="fl">0.1</span><span class="op">)</span></span>
 <span></span>
@@ -183,7 +183,7 @@ to a given scenario:</p>
 <span></span>
 <span>        <span class="co"># Compute realized magnitude</span></span>
 <span>        <span class="va">log_mu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span></span>
-<span>            <span class="va">intercept</span> <span class="op">+</span></span>
+<span>            <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">avg</span><span class="op">)</span> <span class="op">+</span></span>
 <span>                <span class="va">fe_design</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">fe_coefs</span> <span class="op">+</span></span>
 <span>                <span class="va">re_design</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">re_coefs</span> <span class="op">+</span></span>
 <span>                <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">size_factors</span><span class="op">[</span><span class="va">metadata</span><span class="op">$</span><span class="va">batch_id</span><span class="op">]</span><span class="op">)</span></span>
