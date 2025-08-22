@@ -54,11 +54,10 @@
 <span>  n_feats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fl">10000L</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  n_subset <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  n_iters <span class="op">=</span> <span class="fl">5000L</span>,</span>
-<span>  rel_tol <span class="op">=</span> <span class="fl">10000</span>,</span>
+<span>  rel_tol <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  init_alpha <span class="op">=</span> <span class="fl">1e-08</span>,</span>
-<span>  history_size <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  n_threads <span class="op">=</span> <span class="fl">1L</span>,</span>
-<span>  n_retries <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  n_tries <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="fl">3L</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -110,17 +109,12 @@ can sometimes make it easier to estimate size factors for more complex
 designs.</p></dd>
 
 
-<dt id="arg-history-size">history_size<a class="anchor" aria-label="anchor" href="#arg-history-size"></a></dt>
-<dd><p>The number of past updates to use for the L-BFGS
-algorithm.</p></dd>
-
-
 <dt id="arg-n-threads">n_threads<a class="anchor" aria-label="anchor" href="#arg-n-threads"></a></dt>
 <dd><p>The number of threads to use for parallel processing.</p></dd>
 
 
-<dt id="arg-n-retries">n_retries<a class="anchor" aria-label="anchor" href="#arg-n-retries"></a></dt>
-<dd><p>The maximum number of times to retry fitting.</p></dd>
+<dt id="arg-n-tries">n_tries<a class="anchor" aria-label="anchor" href="#arg-n-tries"></a></dt>
+<dd><p>The maximum number of times to try fitting.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>

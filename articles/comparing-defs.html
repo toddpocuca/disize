@@ -173,8 +173,8 @@ for both batch definitions:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Formatting data...</span></span>
 <span><span class="co">#&gt; Optimizing over initialization...</span></span>
-<span><span class="co">#&gt; Estimating size factors... (Max ETA: ~13.1s)</span></span>
-<span><span class="co">#&gt; Finised in 9s!</span></span>
+<span><span class="co">#&gt; Estimating size factors... (Max ETA: ~48.9s)</span></span>
+<span><span class="co">#&gt; Finised in 10.8s!</span></span>
 <span></span>
 <span><span class="va">size_factors_2</span> <span class="op">&lt;-</span> <span class="fu">disize</span><span class="fu">::</span><span class="fu"><a href="../reference/disize.html">disize</a></span><span class="op">(</span></span>
 <span>    <span class="va">design_formula</span>,</span>
@@ -186,8 +186,8 @@ for both batch definitions:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Formatting data...</span></span>
 <span><span class="co">#&gt; Optimizing over initialization...</span></span>
-<span><span class="co">#&gt; Estimating size factors... (Max ETA: ~12.8s)</span></span>
-<span><span class="co">#&gt; Finised in 10.7s!</span></span></code></pre></div>
+<span><span class="co">#&gt; Estimating size factors... (Max ETA: ~48.3s)</span></span>
+<span><span class="co">#&gt; Finised in 19.5s!</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="comparing-definitions">Comparing definitions<a class="anchor" aria-label="anchor" href="#comparing-definitions"></a>
@@ -201,13 +201,13 @@ for both batch definitions:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">size_factors</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    sample_id       id_1        id_2</span></span>
-<span><span class="co">#&gt; 1   treated1  0.3709331  0.43231922</span></span>
-<span><span class="co">#&gt; 2   treated2 -0.3807346 -0.35853783</span></span>
-<span><span class="co">#&gt; 3   treated3 -0.3807346 -0.27121123</span></span>
-<span><span class="co">#&gt; 4 untreated1  0.2341342  0.04459025</span></span>
-<span><span class="co">#&gt; 5 untreated2  0.2341342  0.50729327</span></span>
-<span><span class="co">#&gt; 6 untreated3 -0.5046105 -0.51030232</span></span>
-<span><span class="co">#&gt; 7 untreated4 -0.5046105 -0.36915640</span></span></code></pre></div>
+<span><span class="co">#&gt; 1   treated1  0.3709326  0.43231978</span></span>
+<span><span class="co">#&gt; 2   treated2 -0.3807336 -0.35853789</span></span>
+<span><span class="co">#&gt; 3   treated3 -0.3807336 -0.27121098</span></span>
+<span><span class="co">#&gt; 4 untreated1  0.2341340  0.04459004</span></span>
+<span><span class="co">#&gt; 5 untreated2  0.2341340  0.50729288</span></span>
+<span><span class="co">#&gt; 6 untreated3 -0.5046102 -0.51030245</span></span>
+<span><span class="co">#&gt; 7 untreated4 -0.5046102 -0.36915647</span></span></code></pre></div>
 <p>Although there are some similarities (e.g., the estimates for
 <code>untreated3</code> and <code>treated2</code> are approximately
 equal), there are enough differences between samples that the more
@@ -243,17 +243,17 @@ object, the analysis then proceeds normally.</p>
 <span><span class="co">#&gt; DataFrame with 14599 rows and 6 columns</span></span>
 <span><span class="co">#&gt;                baseMean log2FoldChange     lfcSE       stat    pvalue      padj</span></span>
 <span><span class="co">#&gt;               &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;  &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
-<span><span class="co">#&gt; FBgn0000003    0.187365    -1.03193734  3.804204 -0.2712624 0.7861892        NA</span></span>
-<span><span class="co">#&gt; FBgn0000008  103.057665     0.00258183  0.222254  0.0116166 0.9907315  0.997843</span></span>
-<span><span class="co">#&gt; FBgn0000014    1.140011     0.51874770  2.111253  0.2457061 0.8059098        NA</span></span>
-<span><span class="co">#&gt; FBgn0000015    0.916010     1.88688065  2.062249  0.9149625 0.3602113        NA</span></span>
-<span><span class="co">#&gt; FBgn0000017 4713.919898     0.24364251  0.126651  1.9237331 0.0543881  0.279684</span></span>
+<span><span class="co">#&gt; FBgn0000003    0.187365    -1.03193687  3.804204 -0.2712622 0.7861893        NA</span></span>
+<span><span class="co">#&gt; FBgn0000008  103.057667     0.00258248  0.222254  0.0116195 0.9907292  0.997847</span></span>
+<span><span class="co">#&gt; FBgn0000014    1.140011     0.51874864  2.111252  0.2457066 0.8059094        NA</span></span>
+<span><span class="co">#&gt; FBgn0000015    0.916010     1.88688141  2.062250  0.9149625 0.3602113        NA</span></span>
+<span><span class="co">#&gt; FBgn0000017 4713.920051     0.24364315  0.126651  1.9237370 0.0543876  0.279683</span></span>
 <span><span class="co">#&gt; ...                 ...            ...       ...        ...       ...       ...</span></span>
-<span><span class="co">#&gt; FBgn0261571 9.27146e-02    -0.89084785  3.809351 -0.2338582  0.815095        NA</span></span>
-<span><span class="co">#&gt; FBgn0261572 6.71420e+00     0.96551979  0.763748  1.2641861  0.206163  0.598496</span></span>
-<span><span class="co">#&gt; FBgn0261573 2.42783e+03    -0.00904051  0.117375 -0.0770226  0.938606  0.988238</span></span>
-<span><span class="co">#&gt; FBgn0261574 5.25398e+03    -0.00675329  0.189429 -0.0356508  0.971561  0.993316</span></span>
-<span><span class="co">#&gt; FBgn0261575 1.14935e+01    -0.14708346  0.924524 -0.1590911  0.873597  0.971323</span></span></code></pre></div>
+<span><span class="co">#&gt; FBgn0261571 9.27145e-02    -0.89084712  3.809351 -0.2338580  0.815095        NA</span></span>
+<span><span class="co">#&gt; FBgn0261572 6.71420e+00     0.96552053  0.763748  1.2641866  0.206163  0.598495</span></span>
+<span><span class="co">#&gt; FBgn0261573 2.42783e+03    -0.00903989  0.117375 -0.0770172  0.938610  0.988242</span></span>
+<span><span class="co">#&gt; FBgn0261574 5.25398e+03    -0.00675257  0.189429 -0.0356470  0.971564  0.993315</span></span>
+<span><span class="co">#&gt; FBgn0261575 1.14935e+01    -0.14708236  0.924523 -0.1590900  0.873598  0.971319</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
