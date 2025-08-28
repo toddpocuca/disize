@@ -127,12 +127,22 @@ N_{i^{\dagger}} - y_{i^{\dagger},g} }{ N_{i^{\dagger}} y_{i^{\dagger},g}
 symmetrically “trimming” away the smallest and largest ratios for a
 sample <span class="math inline">i</span> to XX% of the original number
 (defaults to 70%).</p>
-<p>We finally compute the size factor by taking the weighted average of
-these ratios and raising it to the second power:</p>
+<p>We finally compute the “normalization” factor (distinct from a size
+factor) by taking the weighted average of these ratios and raising it to
+the second power:</p>
 <p><span class="math display">
-    \log_2 \hat{s}_i = \frac{ \sum_{g \in \mathcal{G}'_i} w_{i,g}
+    \log_2 \hat{f}_i = \frac{ \sum_{g \in \mathcal{G}'_i} w_{i,g}
 R_{i,g} }{ \sum_{g \in \mathcal{G}'_i} w_{i,g} }
 </span></p>
+<p>The <em>size factor</em> is then found by taking the product with the
+total number of observed counts:</p>
+<p><span class="math display">
+    \hat{s}_i = N_i \hat{f}_i
+</span></p>
+<blockquote>
+<p>Note: This is referred to as the “effective library size” by the
+edgeR authors.</p>
+</blockquote>
 </div>
 </div>
 <div class="section level2">
