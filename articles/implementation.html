@@ -111,13 +111,13 @@ experiments:</p>
     \log \mathbf{\mu}_g &amp;= \mathbf{\alpha}_g + \mathbf{X}
 \mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g + \mathbf{o} \\
         &amp;= \mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g +
-\mathbf{Z}\mathbf{b}_g + (\mathbf{B} \mathbf{s}) \\
+\mathbf{Z}\mathbf{b}_g + (\mathbf{M} \mathbf{s}) \\
     \mathbf{\beta}_g &amp;\sim \text{Normal}(\mathbf{0},
-\mathbf{\lambda}_g^{(f)} \odot \mathbf{\tau}_g^{(f)}) \\
+\mathbf{\lambda}_g^{(f)} \odot \mathbf{\tau}^{(f)}) \\
     \mathbf{\lambda}_g^{(f)} &amp;\sim \text{Half-Cauchy}(\mathbf{0},
 \mathbf{1}) \\
     \mathbf{b}_g &amp;\sim \text{Normal}(\mathbf{0}, \mathbf{R} [
-\mathbf{\lambda}_g^{(r)} \odot \mathbf{\tau}_g^{(r)} ]) \\
+\mathbf{\lambda}_g^{(r)} \odot \mathbf{\tau}^{(r)} ]) \\
     \mathbf{\lambda}_g^{(r)} &amp;\sim \text{Half-Cauchy}(\mathbf{0},
 \mathbf{1}) \\
     \mathbf{1} \cdot \exp(\mathbf{s}) &amp;= n_b
