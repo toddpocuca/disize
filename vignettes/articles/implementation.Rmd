@@ -39,12 +39,12 @@ This allows the priors to be learned independently of each other using the large
 $$\begin{aligned}
     \mathbf{y}_g &\sim \text{NegBinom}(\mathbf{\mu}_g, \phi) \\
     \log \mathbf{\mu}_g &= \mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g + \mathbf{o} \\
-        &= \mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g + (\mathbf{B} \mathbf{s}) \\
-    \mathbf{\beta}_g &\sim \text{Normal}(\mathbf{0}, \mathbf{\lambda}_g^{(f)} \odot \mathbf{\tau}_g^{(f)}) \\
+        &= \mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g + (\mathbf{M} \mathbf{s}) \\
+    \mathbf{\beta}_g &\sim \text{Normal}(\mathbf{0}, \mathbf{\lambda}_g^{(f)} \odot \mathbf{\tau}^{(f)}) \\
     \mathbf{\lambda}_g^{(f)} &\sim \text{Half-Cauchy}(\mathbf{0}, \mathbf{1}) \\
-    \mathbf{b}_g &\sim \text{Normal}(\mathbf{0}, \mathbf{R} [ \mathbf{\lambda}_g^{(r)} \odot \mathbf{\tau}_g^{(r)} ]) \\
+    \mathbf{b}_g &\sim \text{Normal}(\mathbf{0}, \mathbf{R} [ \mathbf{\lambda}_g^{(r)} \odot \mathbf{\tau}^{(r)} ]) \\
     \mathbf{\lambda}_g^{(r)} &\sim \text{Half-Cauchy}(\mathbf{0}, \mathbf{1}) \\
-    \mathbf{1} \cdot \exp(\mathbf{s}) = n_b
+    \mathbf{1} \cdot \exp(\mathbf{s}) &= n_b
 \end{aligned}$$
 
 Where $\mathbf{R}$ specifies the random-effects term membership for each random-effect coefficient, and $n_b$ denotes the number of batches.
@@ -53,4 +53,4 @@ Where $\mathbf{R}$ specifies the random-effects term membership for each random-
 
 Since the posterior distribution for $\mathbf{s}$ is heavily concentrated for typical datasets with thousands of features, it is sufficient to quickly provide a point estimate of $\mathbf{s}$ and delegate estimation of the model coefficients to existing tools like `DESeq2` or `edgeR` (only replacing the small normalization step of their workflows).
 
-`disize` uses Stan's [L-BFGS optimization algorithm](https://mc-stan.org/docs/reference-manual/optimization.html) to find the model's *maximum a posteriori* (MAP) for $\mathbf{s}$. We end up doing this in fewer iterations than needed for all parameters to converge by using a heuristic to guess how long the procedure should run for; this is followed up with a diagnostic to ensure the size factors have converged.
+`disize` uses Stan's [L-BFGS optimization algorithm](https://mc-stan.org/docs/reference-manual/optimization.html) to find the model's *maximum a posteriori* (MAP) for $\mathbf{s}$.

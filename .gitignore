@@ -3,3 +3,4 @@ rv/
 .DS_Store
 docs
 inst/doc
+benchmarks/*/data/*
