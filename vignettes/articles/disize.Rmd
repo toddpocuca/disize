@@ -64,7 +64,7 @@ suppressPackageStartupMessages({
 })
 
 # Set number of threads to use
-n_threads <- parallel::detectCores() / 2
+n_threads <- parallel::detectCores() / 4
 ```
 
 ## Downloading the data

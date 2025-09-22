@@ -21,8 +21,7 @@ split_formula <- function(design_formula) {
     random <- NULL
     if (any(re)) {
         random <- stats::formula(paste0(
-            " ~ 0 + ",
-            paste(terms[re], collapse = " + ")
+            " ~ 0 + ", paste(terms[re], collapse = " + ")
         ))
     }
 
@@ -41,17 +40,13 @@ split_formula <- function(design_formula) {
 #' @param batch_name The identifier for the batch column in 'metadata'.
 #' @param obs_name The identifier for the observation column in 'metadata'.
 #' @param n_feats The number of features used during estimation.
-#' @param n_subset The number of observations per experimental unit used during
-#'  estimation, defaults to 50 (useful for scRNA-seq experiments).
 #' @param n_iters The number of iterations used for estimation.
 #' @param rel_tol The relative tolerance used for convergence.
 #' @param init_alpha The initial step-size for the optimizer, lower values
 #'  can sometimes make it easier to estimate size factors for more complex
 #'  designs.
-#' @param history_size The number of past updates to use for the L-BFGS
-#'  algorithm.
 #' @param n_threads The number of threads to use for parallel processing.
-#' @param n_retries The maximum number of times to retry fitting.
+#' @param n_tries The maximum number of times to try fitting.
 #' @param verbose The verbosity level (`1`: only errors, `2`: also allows
 #'  warnings,`3`: also allows messages, `4`: also prints additional
 #' output useful for debugging).
@@ -66,13 +61,11 @@ disize <- function(
     batch_name,
     obs_name = "obs_id",
     n_feats = min(10000L, ncol(counts)),
-    n_subset = 50L,
-    n_iters = 5000L,
-    rel_tol = 10000,
+    n_iters = 10000L,
+    rel_tol = 1000,
     init_alpha = 1e-8,
-    history_size = 10L,
     n_threads = 1L,
-    n_retries = 2L,
+    n_tries = 5L,
     verbose = 3L) {
     # Argument Checks ----
     # Check design formula is correct
@@ -110,19 +103,6 @@ disize <- function(
         colnames(counts) <- seq_len(ncol(counts))
     }
 
-    # Extract predictor terms
-    predictors <- all.vars(design_formula)
-
-    # Subset observations
-    metadata <- metadata |>
-        dplyr::group_by(dplyr::across(dplyr::all_of(c(
-            predictors,
-            batch_name
-        )))) |>
-        dplyr::slice_sample(n = n_subset, replace = FALSE) |>
-        dplyr::ungroup() |>
-        dplyr::select(dplyr::all_of(c(predictors, obs_name, batch_name)))
-
     # Re-order counts
     counts <- counts[metadata[[obs_name]], ]
 
@@ -138,8 +118,7 @@ disize <- function(
             ") after ",
             "subsetting observations to satisfy n_feats = ",
             n_feats,
-            ". ",
-            "Try increasing 'n_subset' if you have repeated measurements."
+            ". "
         )
     }
     n_feats <- min(n_feats, ncol(counts))
@@ -147,14 +126,6 @@ disize <- function(
     # Preferentially subset features with sufficient counts
     ordering <- order(Matrix::colMeans(counts), decreasing = TRUE)
     counts <- counts[, ordering[1:n_feats]]
-
-    # Subset observations
-    metadata <- metadata |>
-        dplyr::group_by(dplyr::across(dplyr::all_of(predictors))) |>
-        dplyr::slice_sample(n = n_subset, replace = FALSE) |>
-        dplyr::ungroup() |>
-        dplyr::select(dplyr::all_of(c(predictors, obs_name, batch_name)))
-    counts <- counts[metadata[[obs_name]], ]
 
     # Cast to dense matrix
     if (methods::is(counts, "sparseMatrix")) {
@@ -174,7 +145,7 @@ disize <- function(
 
     # Construct fixed-effects model matrix
     if (!base::is.null(design$fixed)) {
-        fe_design <- stats::model.matrix(design$fixed, metadata)
+        fe_design <- model.matrix(design$fixed, metadata)
 
         stan_data[["n_fe"]] <- ncol(fe_design)
         stan_data[["fe_design"]] <- fe_design
@@ -183,7 +154,7 @@ disize <- function(
         stan_data[["fe_design"]] <- array(0, dim = c(stan_data$n_obs, 0))
     }
 
-    # Construct random-effects matrix
+    # Construct random-effects model matrix
     if (!is.null(design$random)) {
         remm <- reformulas::mkReTrms(
             bars = reformulas::findbars(design$random),
@@ -222,6 +193,7 @@ disize <- function(
         stan_data[["re_id"]] <- integer(0)
     }
 
+    # Include counts and grainsize for Stan
     stan_data[["counts"]] <- Matrix::t(counts)
     stan_data[["grainsize"]] <- ceiling(
         stan_data[["n_feats"]] / n_threads
@@ -239,17 +211,22 @@ disize <- function(
     model$.__enclos_env__$private$cpp_options_ <- cpp_options
     # TEMPORARY UNTIL CMDSTANR CPP_OPTIONS REFACTOR ----
 
+    if (3L <= verbose) {
+        message(
+            "Optimizing over initialization..."
+        )
+    }
     # Optimize over initialization
     inits <- list()
     grads <- numeric(3)
-    for (i in 1:(n_retries + 1L)) {
+    for (i in 1:n_tries) {
         fit <- model$optimize(
             data = stan_data,
-            iter = 250L,
+            iter = 200L,
             threads = n_threads,
             algorithm = "lbfgs",
             init_alpha = init_alpha,
-            history_size = history_size,
+            history_size = 10L,
             tol_rel_obj = rel_tol,
             tol_rel_grad = rel_tol,
             sig_figs = 16L,
@@ -278,7 +255,7 @@ disize <- function(
     # Compute estimated maximum ETA
     max_eta <- mean(sapply(inits, function(x) {
         x$time()$total
-    })) / 250 * n_iters
+    })) / 200 * n_iters
 
     # Estimate model parameters ----
     options(cmdstanr_warn_inits = FALSE)
@@ -291,7 +268,8 @@ disize <- function(
     }
 
     # Estimate fit
-    for (i in 1:(n_retries + 1L)) {
+    for (i in 1:n_tries) {
+        # Try fitting model
         fit <- tryCatch(
             expr = {
                 model$optimize(
@@ -301,7 +279,7 @@ disize <- function(
                     threads = n_threads,
                     algorithm = "lbfgs",
                     init_alpha = init_alpha,
-                    history_size = history_size,
+                    history_size = 10L,
                     tol_rel_obj = rel_tol,
                     tol_rel_grad = rel_tol,
                     sig_figs = 16L,
@@ -319,12 +297,25 @@ disize <- function(
             # Check for convergence
             output <- utils::capture.output(fit$output())
             if (any(grepl("Convergence detected", output))) {
+                # Extract size factors
+                sf <- fit$mle("sf")
+                names(sf) <- levels(metadata[[batch_name]])
+
                 break
-            } else if (3L <= verbose) {
-                message("Model did not converge, retrying fit...")
+            } else if (2L <= verbose && i < n_tries) {
+                warning(
+                    "Model did not converge, retrying fit with different ",
+                    "initialization... (if you see this multiple times try ",
+                    "increasing 'n_iters')"
+                )
             }
-        } else if (3L <= verbose) {
-            message("Error during estimation, retrying fit...")
+        } else if (3L <= verbose && i < n_tries) {
+            message(
+                "Error during estimation, retrying fit with different ",
+                "initialization..."
+            )
+        } else {
+            stop("Model did not fit without error after ", n_tries, " tries.")
         }
     }
 
@@ -339,6 +330,10 @@ disize <- function(
     # Extract size factors
     sf <- fit$mle("sf")
     names(sf) <- levels(metadata[[batch_name]])
+
+    if (4L <= verbose) {
+        attr(sf, "fit") <- fit
+    }
 
     sf
 }

@@ -75,7 +75,7 @@ test_that("simple-bulk", {
         counts = counts,
         metadata = metadata,
         batch_name = "batch_id",
-        n_threads = parallel::detectCores()
+        n_threads = parallel::detectCores() / 2L
     ))
 
     expect_equal(
@@ -167,7 +167,7 @@ test_that("simple-sc", {
         counts = counts,
         metadata = metadata,
         batch_name = "batch_id",
-        n_threads = parallel::detectCores() / 2
+        n_threads = parallel::detectCores() / 2L
     ))
 
     expect_equal(

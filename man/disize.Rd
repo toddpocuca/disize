@@ -11,13 +11,11 @@ disize(
   batch_name,
   obs_name = "obs_id",
   n_feats = min(10000L, ncol(counts)),
-  n_subset = 50L,
-  n_iters = 5000L,
-  rel_tol = 10000,
+  n_iters = 10000L,
+  rel_tol = 1000,
   init_alpha = 1e-08,
-  history_size = 10L,
   n_threads = 1L,
-  n_retries = 2L,
+  n_tries = 5L,
   verbose = 3L
 )
 }
@@ -34,9 +32,6 @@ disize(
 
 \item{n_feats}{The number of features used during estimation.}
 
-\item{n_subset}{The number of observations per experimental unit used during
-estimation, defaults to 50 (useful for scRNA-seq experiments).}
-
 \item{n_iters}{The number of iterations used for estimation.}
 
 \item{rel_tol}{The relative tolerance used for convergence.}
@@ -45,12 +40,9 @@ estimation, defaults to 50 (useful for scRNA-seq experiments).}
 can sometimes make it easier to estimate size factors for more complex
 designs.}
 
-\item{history_size}{The number of past updates to use for the L-BFGS
-algorithm.}
-
 \item{n_threads}{The number of threads to use for parallel processing.}
 
-\item{n_retries}{The maximum number of times to retry fitting.}
+\item{n_tries}{The maximum number of times to try fitting.}
 
 \item{verbose}{The verbosity level (\code{1}: only errors, \code{2}: also allows
 warnings,\code{3}: also allows messages, \code{4}: also prints additional

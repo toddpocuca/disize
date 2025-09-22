@@ -36,5 +36,9 @@ dependencies = [
     "edgeR",
     "future",
     "future.apply",
-    "gt"
+    "gt",
+    { name = "httpgd", git = "https://github.com/nx10/httpgd", branch = "master" },
+    "here",
+    "sn",
+    "patchwork",
 ]

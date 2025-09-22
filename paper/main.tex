@@ -1,0 +1,503 @@
+% Template for PLoS
+% Version 3.7 Aug 2025
+%
+% % % % % % % % % % % % % % % % % % % % % %
+%
+% -- IMPORTANT NOTE
+%
+% This template contains comments intended 
+% to minimize problems and delays during our production 
+% process. Please follow the template instructions
+% whenever possible.
+%
+% % % % % % % % % % % % % % % % % % % % % % % 
+%
+% Once your paper is accepted for publication, 
+% PLEASE REMOVE ALL TRACKED CHANGES in this file 
+% and leave only the final text of your manuscript. 
+% PLOS recommends the use of latexdiff to track changes during review, as this will help to maintain a clean tex file.
+% Visit https://www.ctan.org/pkg/latexdiff?lang=en for info or contact us at latex@plos.org.
+%
+%
+% There are no restrictions on package use within the LaTeX files except that no packages listed in the template may be deleted.
+%
+% Please do not include colors or graphics in the text.
+%
+% The manuscript LaTeX source should be contained within a single file (do not use \input, \externaldocument, or similar commands).
+%
+% % % % % % % % % % % % % % % % % % % % % % %
+%
+% -- FIGURES AND TABLES
+%
+% Please include tables/figure captions directly after the paragraph where they are first cited in the text.
+%
+% DO NOT INCLUDE GRAPHICS IN YOUR MANUSCRIPT
+% - Figures should be uploaded separately from your manuscript file. 
+% - Figures generated using LaTeX should be extracted and removed from the PDF before submission. 
+% - Figures containing multiple panels/subfigures must be combined into one image file before submission.
+% For figure citations, please use "Fig" instead of "Figure".
+% See http://journals.plos.org/plosone/s/figures for PLOS figure guidelines.
+%
+% Tables should be cell-based and may not contain:
+% - spacing/line breaks within cells to alter layout or alignment
+% - do not nest tabular environments (no tabular environments within tabular environments)
+% - no graphics or colored text (cell background color/shading OK)
+% See http://journals.plos.org/plosone/s/tables for table guidelines.
+%
+% For tables that exceed the width of the text column, use the adjustwidth environment as illustrated in the example table in text below.
+%
+% % % % % % % % % % % % % % % % % % % % % % % %
+%
+% -- EQUATIONS, MATH SYMBOLS, SUBSCRIPTS, AND SUPERSCRIPTS
+%
+% IMPORTANT
+% Below are a few tips to help format your equations and other special characters according to our specifications. For more tips to help reduce the possibility of formatting errors during conversion, please see our LaTeX guidelines at http://journals.plos.org/plosone/s/latex
+%
+% For inline equations, please be sure to include all portions of an equation in the math environment.  For example, x$^2$ is incorrect; this should be formatted as $x^2$ (or $\mathrm{x}^2$ if the romanized font is desired).
+%
+% Do not include text that is not math in the math environment. For example, CO2 should be written as CO\textsubscript{2} instead of CO$_2$.
+%
+% Please add line breaks to long display equations when possible in order to fit size of the column. 
+%
+% For inline equations, please do not include punctuation (commas, etc) within the math environment unless this is part of the equation.
+%
+% When adding superscript or subscripts outside of brackets/braces, please group using {}.  For example, change "[U(D,E,\gamma)]^2" to "{[U(D,E,\gamma)]}^2". 
+%
+% Do not use \cal for caligraphic font.  Instead, use \mathcal{}
+%
+% % % % % % % % % % % % % % % % % % % % % % % % 
+%
+% Please contact latex@plos.org with any questions.
+%
+% % % % % % % % % % % % % % % % % % % % % % % %
+
+\documentclass[10pt,letterpaper]{article}
+\usepackage[top=0.85in,left=2.75in,footskip=0.75in]{geometry}
+
+% amsmath and amssymb packages, useful for mathematical formulas and symbols
+\usepackage{amsmath,amssymb}
+
+% Use adjustwidth environment to exceed column width (see example table in text)
+\usepackage{changepage}
+
+% textcomp package and marvosym package for additional characters
+\usepackage{textcomp,marvosym}
+
+% cite package, to clean up citations in the main text. Do not remove.
+\usepackage{cite}
+
+% Use nameref to cite supporting information files (see Supporting Information section for more info)
+\usepackage{nameref,hyperref}
+
+% line numbers
+\usepackage[right]{lineno}
+
+% ligatures disabled
+\usepackage[nopatch=eqnum]{microtype}
+\DisableLigatures[f]{encoding = *, family = * }
+
+% color can be used to apply background shading to table cells only
+\usepackage[table]{xcolor}
+
+% array package and thick rules for tables
+\usepackage{array}
+
+% create "+" rule type for thick vertical lines
+\newcolumntype{+}{!{\vrule width 2pt}}
+
+% create \thickcline for thick horizontal lines of variable length
+\newlength\savedwidth
+\newcommand\thickcline[1]{%
+  \noalign{\global\savedwidth\arrayrulewidth\global\arrayrulewidth 2pt}%
+  \cline{#1}%
+  \noalign{\vskip\arrayrulewidth}%
+  \noalign{\global\arrayrulewidth\savedwidth}%
+}
+
+% \thickhline command for thick horizontal lines that span the table
+\newcommand\thickhline{\noalign{\global\savedwidth\arrayrulewidth\global\arrayrulewidth 2pt}%
+\hline
+\noalign{\global\arrayrulewidth\savedwidth}}
+
+
+% Remove comment for double spacing
+%\usepackage{setspace} 
+%\doublespacing
+
+% Text layout
+\raggedright
+\setlength{\parindent}{0.5cm}
+\textwidth 5.25in
+\textheight 8.75in
+
+% Bold the 'Figure #' in the caption and separate it from the title/caption with a period
+% Captions will be left justified
+\usepackage[aboveskip=1pt,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=off]{caption}
+\renewcommand{\figurename}{Fig}
+
+% Please use the included `plos2025.bst` as your BibTeX style
+\bibliographystyle{plos2025}
+
+% Remove brackets from numbering in List of References
+\makeatletter
+\renewcommand{\@biblabel}[1]{\quad#1.}
+\makeatother
+
+
+
+% Header and Footer with logo
+\usepackage{lastpage,fancyhdr,graphicx}
+\usepackage{epstopdf}
+%\pagestyle{myheadings}
+\pagestyle{fancy}
+\fancyhf{}
+%\setlength{\headheight}{27.023pt}
+%\lhead{\includegraphics[width=2.0in]{PLOS-submission.eps}}
+\rfoot{\thepage/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrule}{\hrule height 2pt \vspace{2mm}}
+\fancyheadoffset[L]{2.25in}
+\fancyfootoffset[L]{2.25in}
+\lfoot{\today}
+
+%% Include all user-defined macros below
+
+\newcommand{\lorem}{\textbf{LOREM}}
+\newcommand{\ipsum}{\textbf{IPSUM}}
+
+%% END MACROS SECTION
+
+
+\begin{document}
+\vspace*{0.2in}
+
+% Title must be 250 characters or less.
+\begin{flushleft}
+{\Large
+\textbf{Design-informed Size Factor Estimation} % Please use "sentence case" for title and headings (capitalize only the first word in a title (or heading), the first word in a subtitle (or subheading), and any proper nouns).
+}
+\newline
+% Insert author names, affiliations and corresponding author email (do not include titles, positions, or degrees).
+\\
+Todd Pocuca
+\\
+\bigskip
+
+% Insert additional author notes using the symbols described below. Insert symbol callouts after author names as necessary.
+% 
+% Remove or comment out the author notes below if they aren't used.
+%
+% Primary Equal Contribution Note
+\Yinyang These authors contributed equally to this work.
+
+% Additional Equal Contribution Note
+% Also use this double-dagger symbol for special authorship notes, such as senior authorship.
+\ddag These authors also contributed equally to this work.
+
+% Current address notes
+\textcurrency Current Address: Dept/Program/Center, Institution Name, City, State, Country % change symbol to "\textcurrency a" if more than one current address note
+% \textcurrency b Insert second current address 
+% \textcurrency c Insert third current address
+
+% Deceased author note
+\dag Deceased
+
+% Group/Consortium Author Note
+\textpilcrow Membership list can be found in the Acknowledgments section.
+
+% Use the asterisk to denote corresponding authorship and provide email address in note below.
+* correspondingauthor@institute.edu
+
+\end{flushleft}
+% Please keep the abstract below 300 words
+
+% For PLOS Medicine research article authors, please structure your abstract
+% with "Background", "Method and Findings" and "Conclusion" sections per
+% journal requirements.
+
+% For PLOS Neglected Tropical Diseases research article authors, please
+% structure your abstract with "Background", "Methodology", "Findings", and
+% "Conclusion" sections per journal requirements.
+%
+\section*{Abstract}
+Accurate normalization is critical for differential expression (DE) analysis of RNA-sequencing (RNA-seq) data. 
+However, popular methods such as the Median-of-Ratios (MoR) and Trimmed Mean of M-values (TMM) do not leverage information from the experimental design during normalization. 
+This may be inefficient in experiments with large-scale systematic expression changes or complex designs, where the core assumption can be violated between a pair of samples. 
+Here, we introduce design-informed size factor estimation (disize), a normalization method that directly incorporates the experimental design to improve accuracy. 
+disize employs a modified generalized linear mixed model to robustly distinguish between biological signal and sample-specific size factors. 
+We also propose a mechanistically justified data-generating process (DGP) for RNA-seq counts that is derived from previous models of transcription and sequencing. 
+Using this DGP, we demonstrate through simulations that disize more accurately recovers size factors compared to existing methods, particularly in challenging scenarios with low gene expression and a high proportion of DE genes, and leads to improved downstream analysis. 
+disize provides a more robust and accurate approach to normalization, highlighting the significant benefits of integrating experimental design information directly into normalization for transcriptomic datasets.
+% Please keep the Author Summary between 150 and 200 words. Use first person.
+% PLOS ONE, PLOS Biology, PLOS Global Public Health, PLOS Mental Health, and PLOS Water authors please skip this step. Author Summary is not valid for submissions to these journals.
+
+% For PLOS Medicine authors, please structure your author summary with answers to the following questions:
+% Why was this study done?
+% What did the researchers do and find?
+% What do these findings mean?
+%
+\section*{Author summary}
+When analyzing transcriptomic datasets, accurate normalization is necessary to adjust for technical biases arising from library preparation and sequencing. 
+Methods implemented in popular packages like DESeq2 and edgeR perform this step without considering the experimental design.
+
+We hypothesized that incorporating information from the experimental design into a normalization method would yield more accurate results. 
+Thus, we developed a new method, disize, that uses a statistical model to jointly account for the biological signal defined by the design and the sample-specific batch effect. 
+By separating the biological variation into its components, disize can more robustly estimate the batch effect. 
+To validate our approach, we constructed a flexible simulation framework by detailing a mechanistically-justified data generating process for RNA-seq data.
+Our benchmarks show that disize recovers the true size factors more accurately than existing methods, particularly in challenging scenarios with low counts or a high proportion of DE genes. 
+This improved normalization yields more reliable downstream results in differential expression analysis.
+
+\linenumbers
+
+% Use "Eq" instead of "Equation" for equation citations.
+\section*{Introduction}
+The falling costs of high-throughput sequencing over the last decade have led to a significant increase in transcriptomic experiments, with applications in various fields ranging from oncology \cite{hong_rna_2020} to ecology \cite{todd_power_2016}. 
+In turn, this surge in data has driven the development of statistical models to analyze the resulting RNA sequencing (RNA-seq) data. 
+Among the most widely used tools for RNA-seq analysis are DESeq \cite{anders_differential_2010}, its successor DESeq2 \cite{love_moderated_2014}, and edgeR \cite{robinson_edger_2010}, all of which provide a flexible framework for quantifying differential expression (DE).
+
+Although DESeq and edgeR have evolved considerably since their inception, much of this progress has focused on refining downstream DE testing methodology.
+However, the accuracy of DE analysis is fundamentally dependent on proper normalization, as technical biases from factors like library preparation, sequencing depth, and RNA composition can distort results. 
+To address these biases, both tools rely on default normalization methods—--the median-of-ratios (MoR) \cite{anders_differential_2010} in DESeq/DESeq2 and the trimmed mean of M-values (TMM) \cite{robinson_scaling_2010} in edgeR ---which assume most genes are not DE across samples \cite{anders_differential_2010,robinson_scaling_2010}. 
+In certain scenarios, however, this assumption may be violated strongly enough to compromise the accuracy of these methods.
+
+Notably, a shared characteristic of these methods is the information from the experimental design is not considered during normalization, only during DE testing.
+However, including design information may improve normalization accuracy, particularly in cases where there is systematic biological variation between groups of samples.
+For example, consider that samples belonging to the same experimental unit are more likely to have similar expression profiles, while samples from different groups often exhibit systematic differences.
+This suggests that normalization could be improved by accounting for the biological variation between samples due to the experimental design.
+Motivated by this, we propose \textbf{d}esign-\textbf{i}nformed \textbf{size} factor estimation (disize), which explicitly models both biology and batch effects by directly incorporating the experimental design during estimation.
+
+Additionally, it is crucial to distinguish between how well a given normalization method estimates the technical bias—-- quantified by an estimated "size factor" —--and the effects of this on the downstream DE analysis.
+In a principled evaluation, an ideal normalization method would recover these latent technical factors perfectly, thereby providing a clear upper bound for performance; if we knew the true size factors, it should be impossible to perform better in \textit{any} downstream DE analysis.
+Previous benchmarks have focused exclusively on the effects of normalization on DE testing, which, while important, fails to acknowledge that normalization should only improve a downstream analysis if the estimated size factors accurately recover the underlying technical biases.
+We note this oversight may be in part due to the lack of a detailed data-generating process (DGP) for transcriptomic experiments, which should follow from our mechanistic understanding of transcription and the measurement probe.
+Therefore, we additionally provide a mechanistically justified DGP for RNA-seq experiments that explicitly models the effect of technical factors on the measured count distribution.
+
+\section*{Materials and methods}
+\subsection*{The Data Generating Process of RNA-Seq Data}
+
+We begin the construction of the DGP for RNA-seq data by considering the steady-state distribution of transcript counts of single cells within a homogenous cell population.
+Let $c \in \mathcal{C}$ index a cell, $g \in \cal{G}$ index a gene, and $X_{c,g}$ denote the number of transcripts of gene $g$ for cell $c$.
+We assign a negative binomial (NB) distributions to $X_{c,g}$ based on the model of transcription examined in \cite{corrigan_continuum_2016}, where the steady-state distribution of transcript counts is well described by a NB fit:
+
+\begin{align*}
+    X_{c,g} \sim \text{NegBinom}(\eta_g, \phi_g)
+\end{align*}
+
+We use $\eta_g$ to denote the expected count (a measure of the magnitude of expression) and $\phi_g$ to denote the inverse overdispersion factor (a measure of variability).
+In bulk experiments, however, transcripts from these cells are pooled together, which implies the number of transcripts for a given sample $X_g = \sum_{c \in \cal{C}} X_{c,g}$ are distributed according to a NB with scaled parameters:
+
+\begin{align*}
+    X_g \sim \text{NegBinom}(n_{\cal{C}} \eta_g, n_{\cal{C}} \phi_g)
+\end{align*}
+
+Where $n_{\cal{C}} = |\cal{C}|$.
+With the use of unique molecular identifiers (UMIs), the effect of library preparation and sequencing on the measured count was found to be well approximated by a binomial thinning \cite{kella_binomial_2023} of the original number of transcript counts \cite{schwabe_relation_2022}. 
+In other words, given $X_g$, there exists a total technical effect $\rho$ that acts to stochastically scale down the original number of transcripts:
+
+\begin{align*}
+    Y_g \sim \text{Binomial}(X_g, \rho)
+\end{align*}
+
+However, since $X_g$ is never observed, the compound distribution produced as a result of marginalizing over $X_g$ is given by:
+
+\begin{align*}
+    Y_g \sim \text{NegBinom}(\eta_g \rho, \phi'_g)
+\end{align*}
+
+Where $\rho$ has absorbed the $n_{\cal{C}}$ term (as it is a sample-specific quantity), and $\phi'_g = n_{\cal{C}} \phi_g$.
+Thus, the DGP of RNA-seq data implies the measured count distribution can be well described by a NB with parameters related to the original biological signal $\eta'_g, \phi'_g$ and the sample-specific technical bias $\rho$.
+
+\subsection*{Implementation of disize}
+
+disize uses the probabilistic programming language Stan to fit a Bayesian model that jointly estimates the effect of covariates (structured according to the experimental design) on gene expression and the batch effect.
+
+The model can be described as a modification of a simpler generalized linear mixed model with "offsets":
+
+\begin{align*}
+    y_{i,g} &\sim \text{NegBinom}(\mu_{i,g}, \phi) \\
+    \log \mu_{i,g} &= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g + \log s_{\mathbf{m}[i]}
+\end{align*}
+
+Where $y_{i,g}$ denotes the observed count for a sample $i$ and gene $g$. 
+The count is realized from a negative binomial parameterized by the effect of the covariates $\alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g$, structured according to the experimental design, the batch effect $s_{\mathbf{m}[i]}$, structured according to the batch membership $\mathbf{m}$, and a constant inverse overdispersion factor $\phi$. 
+
+However, since the size factors $\mathbf{s}$ are unobserved (and thus not true offsets), this model is not joint identifiable for most experimental designs (in plain terms, we cannot distinguish between batch and biology).
+
+This is overcome by constraining $\mathbf{s}$ to sum to the total number of batches, and assuming only a fraction of features are significantly affected by the covariates measured in the experiment.
+In other words, the estimated coefficients $\mathbf{\beta}_g, \mathbf{b}_g$ (excluding the intercept) are \textit{sparse} across genes.
+
+We encode this assumption by placing distinct horseshoe priors \cite{carvalho_handling_2009} on each of the model coefficients.
+This allows different degrees of sparsity to be learned for each predictor:
+
+\begin{align*}
+    y_{i,g} &\sim \text{NegBinom}(\mu_{i,g}, \phi) \\
+    \log \mu_{i,g} &= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g + \log s_{\mathbf{m}[i]} \\
+    \beta_{p,g} &\sim \text{Normal}(0, \lambda_{p,g}^{(f)} \tau_{p}^{(f)}) \\
+    \lambda_{p,g}^{(f)} &\sim \text{Half-Cauchy}(0, 1) \\
+    b_{k,g} &\sim \text{Normal}(0, \lambda_{\mathbf{r}[k], g}^{(r)} \tau_{\mathbf{r}[k]}^{(r)}) \\
+    \lambda_{j, g}^{(r)} &\sim \text{Half-Cauchy}(0, 1) \\
+    \mathbf{1}^\top \mathbf{s} &= n_b
+\end{align*}
+
+Where $p$ indexes the fixed-effect coefficients, $j$ indexes the random-effect coefficients, and $\mathbf{r}$ denotes the term membership structure for the random-effect coefficients.
+
+\subsection*{Simulation Framework}
+
+A count matrix $\mathbf{Y}$ is simulated with $n_i$ observations (samples) and $n_g$ features (genes) by specifying an experimental design (which defines the fixed- and random-effects model matrices, $\mathbf{X}$ and $\mathbf{Z}$, respectively) and the following parameters:
+
+\begin{enumerate}
+	\item \verb|n_genes| ($n_g$): The number of genes to simulate.
+	\item \verb|sparsity| ($p$): The fraction of genes that are \textbf{not} affected by the experimental design (i.e., the non-differentially expressed genes).
+	\item \verb|mgt| ($\sigma$): How strongly the experimental design affects genes that are not sparse.
+	\item \verb|avg| ($\delta$): The average baseline expression.
+\end{enumerate}
+
+For each batch $b$, an absolute size factor $\rho_b$ is drawn from a uniform distribution, $\rho_b \sim \text{Uniform}(0.1, 1.0)$.
+For each gene $g$, an inverse overdispersion parameter $\phi_g$ is drawn from a log-normal distribution, $\phi_g \sim \text{LogNormal}(\log 10, 0.5)$.
+A gene-specific baseline expression $\alpha_g$ is drawn from a normal distribution with mean $\delta$ and scale $1$.
+Each fixed-effect coefficient and block of random-effect coefficients (belonging to the same term) is then sampled from a mixture of a point mass at $0$ with probability $p$, and a centred normal distribution with scale $\sigma$ and probability $1 - p$.
+The log of the expected count, $\log \mu_{i,g}$, is then calculated as the sum of the baseline expression, effect from the experimental design, and the log-transformed absolute size factor:
+
+\begin{align*}
+    \log \mu_{i,g} &= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g + \log \rho_{\mathbf{m}[i]}
+\end{align*}
+
+Where $\mathbf{m}$ specifies the batch membership structure for each sample.
+Finally, the observed count for a sample $i$ and gene $g$ is then drawn from a NB with parameters $\mu_{i,g}$ and $\phi_g$:
+
+\begin{align*}
+    y_{i,g} &\sim \text{NegBinom}(\mu_{i,g}, \phi_g) \\
+\end{align*}
+
+
+% Results and Discussion can be combined.
+\section*{Results}
+\subsection*{Size Factor Estimation Accuracy}
+
+To evaluate the performance of disize against established normalization methods, 
+we simulated various scenarios where the degree of sparsity, the magnitude of biological variation due to the experimental design, and the average baseline gene expression were varied. 
+To ensure size factor estimates shared a common scale, all size factors were then constrained to sum to the total number of batches. 
+Across most scenarios, disize demonstrated superior performance in recovering the true batch effect (S1-3), particularly in settings involving a non-trivial experimental designs with systematic biological effects (S2-3) and challenging scenarios with low sparsity (Fig. 1).
+
+% Place figure captions after the first paragraph in which they are cited.
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\textwidth]{figures/fig-sfa-1.png}
+\caption{
+    \textbf{Comparing normalization methods for size factor accuracy across varying expression levels.}
+    Fixing $n_g = 10000$, $p = 0.2$, and $\sigma = 2$, relative size factor error of the other candidate normalization methods (MoR and TMM) compared to disize versus the average baseline gene expression level. Each line represents the median relative error, while the shaded regions indicate the 5th-95th (lighter) and 40th-60th (darker) percentile ranges. A lower relative error indicates a more accurate size factor estimate.}
+\label{fig1}
+\end{figure}
+
+\subsection*{Impact On Downstream Analysis}
+
+We next assessed the downstream impact of normalization on DE testing. 
+To emulate a typical analysis workflow, we used the size factors estimated by each method with the DESeq2 library to test for DE with various experimental designs.
+However, since there exists a trade-off between controlling the Type I and Type II error rate, we evaluated method performance by computing the Type I error rate conditional on a Type II error rate of 20\%, 
+and conversely, the Type II error rate conditional on a Type I error rate of 5\%, thus avoiding the pitfall of a method displaying a superior Type II error due to an inflated Type I error.
+
+As expected, using the true batch effect yielded the lowest Type I and Type II error rates regardless of baseline expression (S4-5, Fig. 2).
+The performance of the estimation methods in the DE analysis directly mirrored their accuracy in size factor estimation, where
+disize consistently achieved the lowest error rates followed by MoR and then TMM.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\textwidth]{figures/fig-di-1.png}
+\caption{
+    \textbf{Comparing normalization methods for type 1 and 2 error across varying expression levels.}
+    Fixing $n_g = 10000$, $p = 0.25$, and $\sigma = 2$, relative type 1 and 2 error of each normalization method (disize, MoR, and TMM) versus the average baseline gene expression level.
+}
+\label{fig2}
+\end{figure}
+
+
+\section*{Discussion}
+
+While there has been significant progress in RNA-seq analysis, much of this work has focused on improving downstream DE testing, with less attention paid to the preceding step of normalization. 
+We address this gap by proposing a novel normalization method that explicitly leverages information from the experimental design to improve the accuracy of size factor estimation.
+Our benchmarking demonstrates that disize works well under various scenarios, particularly those with non-trivial biological variation, low sparsity (i.e., a high proportion of DE genes), and many genes with low expression.
+This makes disize particularly well-suited for single-cell RNA-seq (scRNA-seq) analysis, where pseudo-bulking (aggregating counts from multiple cells into a single "sample") may not accumulate enough counts for other methods to work effectively, and the biological differences between cell types can result in little sparsity. % I kinda want all of this to be one sentence, the idea is low expr + low sparsity makes disize the best choice
+In simpler experiments, however, we found that MoR normalization is a suitable alternative when most genes have sufficient expression and large systematic biological variation is unlikely.
+
+Previous benchmarks of normalization methods \cite{robinson_scaling_2010, li_choice_2020} have simulated data by drawing from a multinomial distribution, where the total number of trials represents the library size and a specified vector of probabilities defines the gene expression profile. 
+While this approach is convenient, it fails to account for the overdispersion present in real RNA-seq data and lacks a mechanistic interpretation that details how the measurement probe produces a biased estimate of the true gene expression.
+We offer an alternative DGP that explicitly models the absolute magnitude of gene expression and the cumulative effect of technical factors to produce the observed count distribution.
+
+Although this work has mostly focused on bulk experiments, since disize allows for an arbitrary batch membership structure, normalization can be done directly with scRNA-seq data. 
+This approach leverages the fact that cells belonging to the same sample share a batch effect. 
+Consequently, using disize with tools specifically developed for DE testing in single-cell experiments—-- such as glmGamPoi \cite{ahlmann-eltze_glmgampoi_2021} --—a pseudo-bulking step can be avoided altogether. 
+However, a potential issue with the current implementation is that disize represents the count matrix in a dense format, which increases the memory footprint and may preclude its use with large datasets. 
+Future work could include allowing a sparse representation to be used, which would significantly reduce the memory requirements.
+
+\section*{Supporting information}
+
+% Include only the SI item label in the paragraph heading. Use the \nameref{label} command to cite SI items in the text.
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{figures/suppfig-sfa-1.png}
+\paragraph*{S1 Fig.}
+\label{S1_Fig}
+\textbf{Comparing normalization methods for size factor accuracy in a trivial design.} 
+Fixing $n_g = 10000$ and varying $p$ and $\sigma$, relative size factor error of the other normalization methods (MoR and TMM) compared to disize versus the average baseline gene expression level. 
+Each line represents the median relative error, while the shaded regions indicate the 5th-95th (lighter) and 40th-60th (darker) percentile ranges. 
+A lower relative error indicates a more accurate size factor estimate.
+\end{figure}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{figures/suppfig-sfa-2.png}
+\paragraph*{S2 Fig.}
+\label{S2_Fig}
+\textbf{Comparing normalization methods for size factor accuracy in a two-group design.}
+Fixing $n_g = 10000$ and varying $p$ and $\sigma$, relative size factor error of the other normalization methods (MoR and TMM) compared to disize versus the average baseline gene expression level. 
+Each line represents the median relative error, while the shaded regions indicate the 5th-95th (lighter) and 40th-60th (darker) percentile ranges. 
+A lower relative error indicates a more accurate size factor estimate.
+\end{figure}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{figures/suppfig-sfa-3.png}
+\paragraph*{S3 Fig.}
+\label{S3_Fig}
+\textbf{Comparing normalization methods for size factor accuracy in a multifactorial design.}
+Fixing $n_g = 10000$ and varying $p$ and $\sigma$, relative size factor error of the other normalization methods (MoR and TMM) compared to disize versus the average baseline gene expression level. 
+Each line represents the median relative error, while the shaded regions indicate the 5th-95th (lighter) and 40th-60th (darker) percentile ranges. 
+A lower relative error indicates a more accurate size factor estimate.
+\end{figure}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{figures/suppfig-di-1.png}
+\paragraph*{S4 Fig.}
+\label{S4_Fig}
+\textbf{Comparing normalization methods for Type 1 error rates in a two-group design.}
+Fixing $n_g = 10000$, $\sigma = 2$, and varying $p$, relative type 1 error rates of each normalization method (disize, MoR, and TMM) to the ground truth batch effect versus the average baseline gene expression level.
+Values close to 1 are better.
+\end{figure}
+
+\begin{figure}[!ht]
+\includegraphics[width=\textwidth]{figures/suppfig-di-2.png}
+\paragraph*{S5 Fig.}
+\label{S5_Fig}
+\textbf{Comparing normalization methods for Type 2 error rates in a two-group design.}
+Fixing $n_g = 10000$, $\sigma = 2$, and varying $p$, relative type 2 error rates of each normalization method (disize, MoR, and TMM) to the ground truth batch effect versus the average baseline gene expression level.
+Values close to 1 are better.
+\end{figure}
+
+\section*{Acknowledgments}
+
+\nolinenumbers
+
+% Please compile your BiBTeX database using the "plos2025.bst" BibTeX style.
+% This file is part of the current package.
+% A sample BibTeX file is also included as "plos_bibtex_sample.bib".
+%
+% or
+%
+% Type in your references following Vancouver style and reference formatting instructions
+% available at https://journals.plos.org/plosone/s/submission-guidelines#loc-references
+% \begin{thebibliography}{}
+% \bibitem{}
+% Text
+% \end{thebibliography}
+
+\bibliography{disize}
+
+\end{document}
+
