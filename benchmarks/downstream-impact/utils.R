@@ -130,46 +130,19 @@ run_benchmark <- function(
                     ) |>
                         dplyr::bind_rows(.id = "sim_id")
 
-                    # Compute (conditional) type 1 & 2 error
-                    t1 <- Vectorize(function(cutoff, method, res_data) {
-                        mean(
-                            res_data$p_values[res_data$null] < cutoff,
-                            na.rm = TRUE
-                        )
-                    }, "cutoff")
-                    t2 <- Vectorize(function(cutoff, method, res_data) {
-                        mean(
-                            res_data$p_values[!res_data$null] > cutoff,
-                            na.rm = TRUE
-                        )
-                    }, "cutoff")
-
-                    # Potential cutoffs
-                    cutoffs <- seq(0, 1, length = 1500)
-
                     # Iterate over methods
                     errors <- lapply(levels(res_data$method), function(method) {
                         cur_data <- res_data[res_data$method == method, ]
 
-                        # Find cutoff with 80% power
-                        c <- cutoffs[
-                            which.min(abs(t2(cutoffs, method, cur_data) - 0.20))
-                        ]
-
                         # Compute conditional type 1 error
                         type_1 <- mean(
-                            cur_data$p_values[cur_data$null] < c,
+                            cur_data$p_values[cur_data$null] < 0.05,
                             na.rm = TRUE
                         )
 
-                        # Find cutoff with a 5% type 1 error rate
-                        c <- cutoffs[
-                            which.min(abs(t1(cutoffs, method, cur_data) - 0.05))
-                        ]
-
                         # Compute conditional type 2 error
                         type_2 <- mean(
-                            cur_data$p_values[!cur_data$null] > c,
+                            cur_data$p_values[!cur_data$null] > 0.05,
                             na.rm = TRUE
                         )
 

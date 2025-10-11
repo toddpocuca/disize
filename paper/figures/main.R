@@ -14,7 +14,7 @@ plot_benchmark <- function(benchmark, title, design_formula) {
         geom_ribbon(aes(ymin = q5, ymax = q95), alpha = 0.1) +
         geom_ribbon(aes(ymin = q40, ymax = q60), alpha = 0.2) +
         geom_line(aes(x = avg, y = q50, color = comparison)) +
-        scale_y_log10() +
+        scale_y_log10(breaks = c(1, 5, 10, 25)) +
         facet_wrap(
             ncol = 2,
             facets = c("sparsity", "mgt"),
@@ -24,11 +24,6 @@ plot_benchmark <- function(benchmark, title, design_formula) {
             )
         ) +
         labs(
-            title = title,
-            subtitle = paste(
-                "Design Formula:",
-                paste(as.character(design_formula), collapse = " ")
-            ),
             x = "Average Baseline Expression Level",
             y = "Relative Error",
             color = "Method",
@@ -68,10 +63,8 @@ my_plot <- ggplot(
     geom_ribbon(aes(ymin = q5, ymax = q95), alpha = 0.1) +
     geom_ribbon(aes(ymin = q40, ymax = q60), alpha = 0.2) +
     geom_line(aes(x = avg, y = q50, color = comparison)) +
-    scale_y_log10() +
+    scale_y_log10(breaks = c(1, 5, 10, 25)) +
     labs(
-        title = "Comparing Two Conditions",
-        subtitle = "Design Formula: ~ cond_id",
         x = "Average Baseline Expression Level",
         y = "Relative Error",
         color = "Method",
@@ -173,46 +166,34 @@ benchmark <- read.table(
             "tmm" ~ "TMM (edgeR)",
             .default = method
         )
-    ) |>
-    dplyr::filter(
-        method != "ground_truth"
     )
 
 # Figure 2
 my_plot <- ((
     ggplot(
         data = benchmark |> dplyr::filter(sparsity == 0.25),
-        mapping = aes(x = avg, y = type_1_relative, color = method)
+        mapping = aes(x = avg, y = type_1, color = method)
     ) +
         geom_line() +
         labs(
             x = "Average Baseline Expression Level",
-            y = "Relative Type 1 Error",
+            y = "Type 1 Error",
             color = "Method"
         ) +
-        geom_hline(yintercept = 1.0, linetype = "dashed") +
         theme_classic()
 ) / (
     ggplot(
         data = benchmark |> dplyr::filter(sparsity == 0.25),
-        mapping = aes(x = avg, y = type_2_relative, color = method)
+        mapping = aes(x = avg, y = type_2, color = method)
     ) +
         geom_line() +
         labs(
             x = "Average Baseline Expression Level",
-            y = "Relative Type 2 Error",
+            y = "Type 2 Error",
             color = "Method"
         ) +
-        geom_hline(yintercept = 1.0, linetype = "dashed") +
         theme_classic()
-)) +
-    plot_annotation(
-        title = "Comparing Two Conditions",
-        subtitle = paste(
-            "Design Formula:",
-            paste(as.character(~cond_id), collapse = " ")
-        )
-    )
+))
 ggplot2::ggsave(
     filename = "paper/figures/fig-di-1.png",
     plot = my_plot,
@@ -226,7 +207,7 @@ ggplot2::ggsave(
 # Plot type 1 error
 my_plot <- ggplot(
     data = benchmark,
-    mapping = aes(x = avg, y = type_1_relative, color = method)
+    mapping = aes(x = avg, y = type_1, color = method)
 ) +
     geom_line() +
     facet_wrap(
@@ -238,16 +219,10 @@ my_plot <- ggplot(
         )
     ) +
     labs(
-        title = "Comparing Two Conditions",
-        subtitle = paste(
-            "Design Formula:",
-            paste(as.character(~cond_id), collapse = " ")
-        ),
         x = "Average Baseline Expression Level",
-        y = "Relative Type 1 Error",
+        y = "Type 1 Error",
         color = "Method"
     ) +
-    geom_hline(yintercept = 1.0, linetype = "dashed") +
     theme_classic()
 ggplot2::ggsave(
     filename = "paper/figures/suppfig-di-1.png",
@@ -260,7 +235,7 @@ ggplot2::ggsave(
 # Plot type 2 error
 my_plot <- ggplot(
     data = benchmark,
-    mapping = aes(x = avg, y = type_2_relative, color = method)
+    mapping = aes(x = avg, y = type_2, color = method)
 ) +
     geom_line() +
     facet_wrap(
@@ -272,16 +247,10 @@ my_plot <- ggplot(
         )
     ) +
     labs(
-        title = "Comparing Two Conditions",
-        subtitle = paste(
-            "Design Formula:",
-            paste(as.character(~cond_id), collapse = " ")
-        ),
         x = "Average Baseline Expression Level",
-        y = "Relative Type 2 Error",
+        y = "Type 2 Error",
         color = "Method"
     ) +
-    geom_hline(yintercept = 1.0, linetype = "dashed") +
     theme_classic()
 ggplot2::ggsave(
     filename = "paper/figures/suppfig-di-2.png",

@@ -33,13 +33,6 @@ parallel::clusterEvalQ(cl, {
 })
 
 # Set future plan
-# Run benchmark
-benchmark <- run_benchmark(
-    n_sims,
-    sim_pars,
-    design_formula,
-    metadata
-)
 future::plan(future::cluster, workers = cl)
 
 # Number of simulations
@@ -54,7 +47,6 @@ sim_pars <- expand.grid(
 ) |>
     tibble::rowid_to_column("setting_id")
 
-
 # Comparing Two Conditions ----
 # Construct experimental design
 design_formula <- ~cond_id
@@ -67,7 +59,13 @@ metadata <- data.frame(
 )
 levels(metadata$cond_id) <- letters[1:2]
 
-
+# Run benchmark
+benchmark <- run_benchmark(
+    n_sims,
+    sim_pars,
+    design_formula,
+    metadata
+)
 write.table(
     x = benchmark,
     file = "benchmarks/downstream-impact/data/scenario-1.tsv",

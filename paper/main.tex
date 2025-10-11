@@ -179,7 +179,7 @@
 \newline
 % Insert author names, affiliations and corresponding author email (do not include titles, positions, or degrees).
 \\
-Todd Pocuca
+Todd Pocuca, Ben Bolker, Guillaume Paré
 \\
 \bigskip
 
@@ -220,14 +220,14 @@ Todd Pocuca
 % "Conclusion" sections per journal requirements.
 %
 \section*{Abstract}
-Accurate normalization is critical for differential expression (DE) analysis of RNA-sequencing (RNA-seq) data. 
-However, popular methods such as the Median-of-Ratios (MoR) and Trimmed Mean of M-values (TMM) do not leverage information from the experimental design during normalization. 
-This may be inefficient in experiments with large-scale systematic expression changes or complex designs, where the core assumption can be violated between a pair of samples. 
-Here, we introduce design-informed size factor estimation (disize), a normalization method that directly incorporates the experimental design to improve accuracy. 
+Accurate normalization is critical for differential expression analysis of RNA-sequencing data. 
+Popular methods such as the Median-of-Ratios and Trimmed Mean of M-values fail to leverage information from the experimental design during normalization. 
+This may be inefficient in experiments with large-scale systematic expression changes or complex designs.
+Here, we introduce design-informed size factor estimation, a normalization method that uses information from the experimental design to improve accuracy. 
 disize employs a modified generalized linear mixed model to robustly distinguish between biological signal and sample-specific size factors. 
-We also propose a mechanistically justified data-generating process (DGP) for RNA-seq counts that is derived from previous models of transcription and sequencing. 
-Using this DGP, we demonstrate through simulations that disize more accurately recovers size factors compared to existing methods, particularly in challenging scenarios with low gene expression and a high proportion of DE genes, and leads to improved downstream analysis. 
-disize provides a more robust and accurate approach to normalization, highlighting the significant benefits of integrating experimental design information directly into normalization for transcriptomic datasets.
+We also propose a mechanistically justified data-generating process for RNA-sequencing counts that is derived from previous models of transcription and sequencing. 
+Using this data-generating process, we demonstrate through simulations that disize recovers size factors more accurately than existing methods, particularly in challenging scenarios with low gene expression and a high proportion of differential expression genes, and this in turn leads to an improved downstream analysis. 
+disize provides a robust and accurate approach to normalization, highlighting the significant benefits of integrating experimental design information directly into normalization for transcriptomic datasets.
 % Please keep the Author Summary between 150 and 200 words. Use first person.
 % PLOS ONE, PLOS Biology, PLOS Global Public Health, PLOS Mental Health, and PLOS Water authors please skip this step. Author Summary is not valid for submissions to these journals.
 
@@ -237,10 +237,10 @@ disize provides a more robust and accurate approach to normalization, highlighti
 % What do these findings mean?
 %
 \section*{Author summary}
-When analyzing transcriptomic datasets, accurate normalization is necessary to adjust for technical biases arising from library preparation and sequencing. 
-Methods implemented in popular packages like DESeq2 and edgeR perform this step without considering the experimental design.
+When analyzing transcriptomic datasets, normalization adjusts for technical biases arising from library preparation and sequencing. 
+Methods implemented in popular packages like DESeq2 and edgeR ignore information in the experimental design during normalization.
 
-We hypothesized that incorporating information from the experimental design into a normalization method would yield more accurate results. 
+We propose that incorporating information from the experimental design into a normalization method has the potential to yield more accurate results. 
 Thus, we developed a new method, disize, that uses a statistical model to jointly account for the biological signal defined by the design and the sample-specific batch effect. 
 By separating the biological variation into its components, disize can more robustly estimate the batch effect. 
 To validate our approach, we constructed a flexible simulation framework by detailing a mechanistically-justified data generating process for RNA-seq data.
@@ -251,26 +251,26 @@ This improved normalization yields more reliable downstream results in different
 
 % Use "Eq" instead of "Equation" for equation citations.
 \section*{Introduction}
-The falling costs of high-throughput sequencing over the last decade have led to a significant increase in transcriptomic experiments, with applications in various fields ranging from oncology \cite{hong_rna_2020} to ecology \cite{todd_power_2016}. 
-In turn, this surge in data has driven the development of statistical models to analyze the resulting RNA sequencing (RNA-seq) data. 
-Among the most widely used tools for RNA-seq analysis are DESeq \cite{anders_differential_2010}, its successor DESeq2 \cite{love_moderated_2014}, and edgeR \cite{robinson_edger_2010}, all of which provide a flexible framework for quantifying differential expression (DE).
+The falling costs of high-throughput sequencing over the last decade have led to an increase in transcriptomic experiments, with applications in various fields ranging from oncology \cite{hong_rna_2020} to ecology \cite{todd_power_2016}. 
+This surge in data has in turn driven the development of statistical models to analyze the resulting RNA sequencing (RNA-seq) data. 
+Among the most widely used tools for RNA-seq analysis are DESeq \cite{anders_differential_2010}, its successor DESeq2 \cite{love_moderated_2014}, and edgeR \cite{robinson_edger_2010}, all of which provide flexible frameworks for quantifying differential expression (DE).
 
-Although DESeq and edgeR have evolved considerably since their inception, much of this progress has focused on refining downstream DE testing methodology.
-However, the accuracy of DE analysis is fundamentally dependent on proper normalization, as technical biases from factors like library preparation, sequencing depth, and RNA composition can distort results. 
-To address these biases, both tools rely on default normalization methods—--the median-of-ratios (MoR) \cite{anders_differential_2010} in DESeq/DESeq2 and the trimmed mean of M-values (TMM) \cite{robinson_scaling_2010} in edgeR ---which assume most genes are not DE across samples \cite{anders_differential_2010,robinson_scaling_2010}. 
+Although DESeq and edgeR have evolved considerably since their inception, this progress has largely focused on refining downstream DE testing methodology.
+However, the accuracy of DE analysis is fundamentally depends on proper normalization, as technical biases from factors like library preparation, sequencing depth, and RNA composition can distort results. 
+To address these biases, both tools rely on default normalization methods—--the median-of-ratios (MoR) \cite{anders_differential_2010} in DESeq/DESeq2 and the trimmed mean of M-values (TMM) \cite{robinson_scaling_2010} in edgeR ---which assume most genes are not differentially expressed across samples \cite{anders_differential_2010,robinson_scaling_2010}. 
 In certain scenarios, however, this assumption may be violated strongly enough to compromise the accuracy of these methods.
 
 Notably, a shared characteristic of these methods is the information from the experimental design is not considered during normalization, only during DE testing.
-However, including design information may improve normalization accuracy, particularly in cases where there is systematic biological variation between groups of samples.
-For example, consider that samples belonging to the same experimental unit are more likely to have similar expression profiles, while samples from different groups often exhibit systematic differences.
+Including design information may improve normalization accuracy, particularly when there is systematic biological variation between groups of samples.
+For example, samples belonging to the same experimental unit are likely to have similar expression profiles, while samples from different groups often exhibit systematic differences.
 This suggests that normalization could be improved by accounting for the biological variation between samples due to the experimental design.
 Motivated by this, we propose \textbf{d}esign-\textbf{i}nformed \textbf{size} factor estimation (disize), which explicitly models both biology and batch effects by directly incorporating the experimental design during estimation.
 
-Additionally, it is crucial to distinguish between how well a given normalization method estimates the technical bias—-- quantified by an estimated "size factor" —--and the effects of this on the downstream DE analysis.
-In a principled evaluation, an ideal normalization method would recover these latent technical factors perfectly, thereby providing a clear upper bound for performance; if we knew the true size factors, it should be impossible to perform better in \textit{any} downstream DE analysis.
+Additionally, it is crucial to distinguish between how well a given normalization method estimates the technical bias—-- quantified by an estimated "size factor" —--and its effects on the downstream DE analysis.
+An ideal normalization method would recover these latent technical factors perfectly, thereby providing a clear upper bound for performance; if we knew the true size factors, it should be impossible to perform better in \textit{any} downstream DE analysis.
 Previous benchmarks have focused exclusively on the effects of normalization on DE testing, which, while important, fails to acknowledge that normalization should only improve a downstream analysis if the estimated size factors accurately recover the underlying technical biases.
-We note this oversight may be in part due to the lack of a detailed data-generating process (DGP) for transcriptomic experiments, which should follow from our mechanistic understanding of transcription and the measurement probe.
-Therefore, we additionally provide a mechanistically justified DGP for RNA-seq experiments that explicitly models the effect of technical factors on the measured count distribution.
+This oversight may be in part due to the lack of a detailed data-generating process (DGP) for transcriptomic experiments, which should follow from our mechanistic understanding of transcription and the measurement probe.
+Therefore, we additionally suggest a mechanistically justified DGP for RNA-seq experiments that explicitly models the effect of technical factors on the measured count distribution.
 
 \section*{Materials and methods}
 \subsection*{The Data Generating Process of RNA-Seq Data}
@@ -282,78 +282,87 @@ We assign a negative binomial (NB) distributions to $X_{c,g}$ based on the model
 \begin{align*}
     X_{c,g} \sim \text{NegBinom}(\eta_g, \phi_g)
 \end{align*}
-
 We use $\eta_g$ to denote the expected count (a measure of the magnitude of expression) and $\phi_g$ to denote the inverse overdispersion factor (a measure of variability).
 In bulk experiments, however, transcripts from these cells are pooled together, which implies the number of transcripts for a given sample $X_g = \sum_{c \in \cal{C}} X_{c,g}$ are distributed according to a NB with scaled parameters:
 
-\begin{align*}
+\begin{align}
     X_g \sim \text{NegBinom}(n_{\cal{C}} \eta_g, n_{\cal{C}} \phi_g)
-\end{align*}
-
-Where $n_{\cal{C}} = |\cal{C}|$.
+\end{align}
+where $n_{\cal{C}} = |\cal{C}|$.
 With the use of unique molecular identifiers (UMIs), the effect of library preparation and sequencing on the measured count was found to be well approximated by a binomial thinning \cite{kella_binomial_2023} of the original number of transcript counts \cite{schwabe_relation_2022}. 
 In other words, given $X_g$, there exists a total technical effect $\rho$ that acts to stochastically scale down the original number of transcripts:
 
-\begin{align*}
+\begin{align}
     Y_g \sim \text{Binomial}(X_g, \rho)
-\end{align*}
-
+\end{align}
 However, since $X_g$ is never observed, the compound distribution produced as a result of marginalizing over $X_g$ is given by:
 
-\begin{align*}
+\begin{align}
     Y_g \sim \text{NegBinom}(\eta_g \rho, \phi'_g)
-\end{align*}
+\end{align}
+where $\rho$ has absorbed the $n_{\cal{C}}$ term (as it is a sample-specific quantity), and $\phi'_g = n_{\cal{C}} \phi_g$.
+Thus, the proposed DGP implies the measured count distribution can be well described by a NB with parameters related to the original biological signal $\eta'_g, \phi'_g$ and a sample-specific technical bias $\rho$ that scales this distribution.
 
-Where $\rho$ has absorbed the $n_{\cal{C}}$ term (as it is a sample-specific quantity), and $\phi'_g = n_{\cal{C}} \phi_g$.
-Thus, the DGP of RNA-seq data implies the measured count distribution can be well described by a NB with parameters related to the original biological signal $\eta'_g, \phi'_g$ and the sample-specific technical bias $\rho$.
 
 \subsection*{Implementation of disize}
 
-disize uses the probabilistic programming language Stan to fit a Bayesian model that jointly estimates the effect of covariates (structured according to the experimental design) on gene expression and the batch effect.
+disize uses the L-BFGS algorithm offered in the probabilistic programming language Stan to fit a Bayesian model that jointly estimates the effect of covariates (structured according to the experimental design) on gene expression and the batch effect.
 
-The model can be described as a modification of a simpler generalized linear mixed model with "offsets":
+The model can be described as a modification of a simpler generalized linear mixed model with offsets:
 
-\begin{align*}
-    y_{i,g} &\sim \text{NegBinom}(\mu_{i,g}, \phi) \\
-    \log \mu_{i,g} &= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g + \log s_{\mathbf{m}[i]}
-\end{align*}
+\begin{subequations}
+    \begin{align}
+        y_{i,g} &\sim \text{NegBinom}(\mu_{i,g}, \phi) \\
+        \log \mu_{i,g} &= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g + \log s_{\mathbf{m}[i]}
+    \end{align}
+\end{subequations}
+where $y_{i,g}$ denotes the observed count for a sample $i$ and gene $g$. 
+The count is realized from a negative binomial with a mean described by the effect of the covariates $\alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g$, structured according to the experimental design, and the batch effect $s_{\mathbf{m}[i]}$, structured according to the batch membership $\mathbf{m}$, and a constant inverse overdispersion factor $\phi$:
 
-Where $y_{i,g}$ denotes the observed count for a sample $i$ and gene $g$. 
-The count is realized from a negative binomial parameterized by the effect of the covariates $\alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g$, structured according to the experimental design, the batch effect $s_{\mathbf{m}[i]}$, structured according to the batch membership $\mathbf{m}$, and a constant inverse overdispersion factor $\phi$. 
+\begin{subequations}
+    \begin{align}
+        \mathbb{E}[Y_{i,g}] &= \mu_{i,g} = e^{\alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g} \cdot s_{\mathbf{m}[i]} \\
+        \text{Var}(Y_{i,g}) &= \mu_{i,g} + \frac{\mu_{i,g}^2}{\phi}
+    \end{align}
+\end{subequations}
+however, since the size factors $\mathbf{s}$ are unobserved (and thus not true offsets), this model is not identifiable for most experimental designs: in plain terms, we cannot distinguish between batch and biology.
 
-However, since the size factors $\mathbf{s}$ are unobserved (and thus not true offsets), this model is not joint identifiable for most experimental designs (in plain terms, we cannot distinguish between batch and biology).
-
-This is overcome by constraining $\mathbf{s}$ to sum to the total number of batches, and assuming only a fraction of features are significantly affected by the covariates measured in the experiment.
+This problem is overcome by constraining $\mathbf{s}$ to sum to the total number of batches, and assuming only a subset of features are affected by the covariates measured in the experiment. 
 In other words, the estimated coefficients $\mathbf{\beta}_g, \mathbf{b}_g$ (excluding the intercept) are \textit{sparse} across genes.
 
-We encode this assumption by placing distinct horseshoe priors \cite{carvalho_handling_2009} on each of the model coefficients.
-This allows different degrees of sparsity to be learned for each predictor:
+We encode this assumption by placing separate horseshoe priors \cite{carvalho_handling_2009} on each of the model coefficients.
+This structure allows different degrees of sparsity for each predictor:
 
-\begin{align*}
-    y_{i,g} &\sim \text{NegBinom}(\mu_{i,g}, \phi) \\
-    \log \mu_{i,g} &= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g + \log s_{\mathbf{m}[i]} \\
-    \beta_{p,g} &\sim \text{Normal}(0, \lambda_{p,g}^{(f)} \tau_{p}^{(f)}) \\
-    \lambda_{p,g}^{(f)} &\sim \text{Half-Cauchy}(0, 1) \\
-    b_{k,g} &\sim \text{Normal}(0, \lambda_{\mathbf{r}[k], g}^{(r)} \tau_{\mathbf{r}[k]}^{(r)}) \\
-    \lambda_{j, g}^{(r)} &\sim \text{Half-Cauchy}(0, 1) \\
-    \mathbf{1}^\top \mathbf{s} &= n_b
-\end{align*}
+\begin{subequations}
+    \begin{align}
+        y_{i,g} &\sim \text{NegBinom}(\mu_{i,g}, \phi) \\
+        \log \mu_{i,g} &= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g + \log s_{\mathbf{m}[i]} \\
+        \beta_{p,g} &\sim \text{Normal}(0, \lambda_{p,g}^{(f)} \tau_{p}^{(f)}) \\
+        \lambda_{p,g}^{(f)} &\sim \text{Half-Cauchy}(0, 1) \\
+        b_{k,g} &\sim \text{Normal}(0, \lambda_{\mathbf{r}[k], g}^{(r)} \tau_{\mathbf{r}[k]}^{(r)}) \\
+        \lambda_{j, g}^{(r)} &\sim \text{Half-Cauchy}(0, 1) \\
+        \mathbf{1}^\top \mathbf{s} &= n_b
+    \end{align}
+    \label{model}
+\end{subequations}
+where $p$ indexes the fixed-effect coefficients, $k$ indexes the random-effect coefficients, $j$ indexes distinct random-effect terms, and $\mathbf{r}$ denotes the term membership structure for the random-effect coefficients.
 
-Where $p$ indexes the fixed-effect coefficients, $j$ indexes the random-effect coefficients, and $\mathbf{r}$ denotes the term membership structure for the random-effect coefficients.
+Additionally, the Stan implementation splits the data and parameter matrices into chunks gene-wise in order to evaluate all distribution statements in parallel using \verb|reduce_sum|.
 
 \subsection*{Simulation Framework}
 
-A count matrix $\mathbf{Y}$ is simulated with $n_i$ observations (samples) and $n_g$ features (genes) by specifying an experimental design (which defines the fixed- and random-effects model matrices, $\mathbf{X}$ and $\mathbf{Z}$, respectively) and the following parameters:
+The suggested DGP above implies the expectation of a count matrix can be decomposed into the effects of the experimental design on the true biological signal and the batch-effect.
+Therefore, we can construct a count matrix $\mathbf{Y}$ with $n_i$ observations (samples) and $n_g$ features (genes) for a specified experimental design (which defines the fixed- and random-effects model matrices, $\mathbf{X}$ and $\mathbf{Z}$, respectively) and the following parameters:
 
 \begin{enumerate}
 	\item \verb|n_genes| ($n_g$): The number of genes to simulate.
-	\item \verb|sparsity| ($p$): The fraction of genes that are \textbf{not} affected by the experimental design (i.e., the non-differentially expressed genes).
-	\item \verb|mgt| ($\sigma$): How strongly the experimental design affects genes that are not sparse.
+	\item \verb|sparsity| ($p$): The fraction of genes that are \textit{not} affected by the experimental conditions (i.e., the non-differentially expressed genes).
+	\item \verb|mgt| ($\sigma$): How strongly the experimental design affects genes that are not DE.
 	\item \verb|avg| ($\delta$): The average baseline expression.
 \end{enumerate}
 
-For each batch $b$, an absolute size factor $\rho_b$ is drawn from a uniform distribution, $\rho_b \sim \text{Uniform}(0.1, 1.0)$.
-For each gene $g$, an inverse overdispersion parameter $\phi_g$ is drawn from a log-normal distribution, $\phi_g \sim \text{LogNormal}(\log 10, 0.5)$.
+For each batch $b$, we draw an absolute size factor $\rho_b$ from a uniform distribution, $\rho_b \sim \text{Uniform}(0.1, 1.0)$.
+For each gene $g$, we next draw an inverse overdispersion parameter $\phi_g$ from a log-normal distribution, $\phi_g \sim \text{LogNormal}(\log 10, 0.5)$.
 A gene-specific baseline expression $\alpha_g$ is drawn from a normal distribution with mean $\delta$ and scale $1$.
 Each fixed-effect coefficient and block of random-effect coefficients (belonging to the same term) is then sampled from a mixture of a point mass at $0$ with probability $p$, and a centred normal distribution with scale $\sigma$ and probability $1 - p$.
 The log of the expected count, $\log \mu_{i,g}$, is then calculated as the sum of the baseline expression, effect from the experimental design, and the log-transformed absolute size factor:
@@ -375,9 +384,9 @@ Finally, the observed count for a sample $i$ and gene $g$ is then drawn from a N
 \subsection*{Size Factor Estimation Accuracy}
 
 To evaluate the performance of disize against established normalization methods, 
-we simulated various scenarios where the degree of sparsity, the magnitude of biological variation due to the experimental design, and the average baseline gene expression were varied. 
+we simulated various scenarios varying the degree of sparsity, the magnitude of biological variation due to the experimental conditions, and the average baseline gene expression. 
 To ensure size factor estimates shared a common scale, all size factors were then constrained to sum to the total number of batches. 
-Across most scenarios, disize demonstrated superior performance in recovering the true batch effect (S1-3), particularly in settings involving a non-trivial experimental designs with systematic biological effects (S2-3) and challenging scenarios with low sparsity (Fig. 1).
+Across most scenarios, disize was better at recovering the true batch effect (S1-3), particularly in settings involving experimental designs with systematic biological effects (S2-3) and challenging scenarios with low sparsity (Fig. 1).
 
 % Place figure captions after the first paragraph in which they are cited.
 \begin{figure}[!ht]
@@ -392,13 +401,11 @@ Across most scenarios, disize demonstrated superior performance in recovering th
 \subsection*{Impact On Downstream Analysis}
 
 We next assessed the downstream impact of normalization on DE testing. 
-To emulate a typical analysis workflow, we used the size factors estimated by each method with the DESeq2 library to test for DE with various experimental designs.
-However, since there exists a trade-off between controlling the Type I and Type II error rate, we evaluated method performance by computing the Type I error rate conditional on a Type II error rate of 20\%, 
-and conversely, the Type II error rate conditional on a Type I error rate of 5\%, thus avoiding the pitfall of a method displaying a superior Type II error due to an inflated Type I error.
+To emulate a typical analysis workflow, we used the size factors estimated by each method with the DESeq2 package to test for DE with various experimental designs.
 
-As expected, using the true batch effect yielded the lowest Type I and Type II error rates regardless of baseline expression (S4-5, Fig. 2).
+As expected, using the true batch effect yielded the lowest Type I error rates across baseline expression levels, while the Type II error rates were comparable across methods (S4-5, Fig. 2).
 The performance of the estimation methods in the DE analysis directly mirrored their accuracy in size factor estimation, where
-disize consistently achieved the lowest error rates followed by MoR and then TMM.
+disize consistently achieved the lowest error rates followed by MoR and TMM.
 
 \begin{figure}[!ht]
 \centering
@@ -413,21 +420,31 @@ disize consistently achieved the lowest error rates followed by MoR and then TMM
 
 \section*{Discussion}
 
-While there has been significant progress in RNA-seq analysis, much of this work has focused on improving downstream DE testing, with less attention paid to the preceding step of normalization. 
+While researchers have made significant progress in RNA-seq analysis, much of this work has focused on improving downstream DE testing, with less attention paid to the preceding step of normalization. 
 We address this gap by proposing a novel normalization method that explicitly leverages information from the experimental design to improve the accuracy of size factor estimation.
 Our benchmarking demonstrates that disize works well under various scenarios, particularly those with non-trivial biological variation, low sparsity (i.e., a high proportion of DE genes), and many genes with low expression.
-This makes disize particularly well-suited for single-cell RNA-seq (scRNA-seq) analysis, where pseudo-bulking (aggregating counts from multiple cells into a single "sample") may not accumulate enough counts for other methods to work effectively, and the biological differences between cell types can result in little sparsity. % I kinda want all of this to be one sentence, the idea is low expr + low sparsity makes disize the best choice
-In simpler experiments, however, we found that MoR normalization is a suitable alternative when most genes have sufficient expression and large systematic biological variation is unlikely.
+This makes disize particularly well-suited for single-cell RNA-seq (scRNA-seq) analysis, where pseudo-bulking (aggregating counts from multiple cells into a single "sample") may not accumulate enough counts for other methods to work effectively, and the biological differences between cell types can result in little sparsity.
+Although the Type II error rates were comparable across methods, since disize had the lowest Type I error rate--- often below the nominal $\alpha = 0.05$ ---there is potential for increasing the specified significance threshold to produce a lower Type II error rate while retaining a Type I error below the desired $\alpha$.
+In simpler experiments, however, we found that MoR normalization is comparable to disize when most genes have sufficient expression (\textgreater 100 counts) and large systematic biological variation is unlikely.
 
 Previous benchmarks of normalization methods \cite{robinson_scaling_2010, li_choice_2020} have simulated data by drawing from a multinomial distribution, where the total number of trials represents the library size and a specified vector of probabilities defines the gene expression profile. 
-While this approach is convenient, it fails to account for the overdispersion present in real RNA-seq data and lacks a mechanistic interpretation that details how the measurement probe produces a biased estimate of the true gene expression.
-We offer an alternative DGP that explicitly models the absolute magnitude of gene expression and the cumulative effect of technical factors to produce the observed count distribution.
+While this approach is convenient, it fails to account for the overdispersion present in real RNA-seq data and lacks a realistic mechanism describing how the observed count distribution is derived from the .
+We offer an alternative DGP that explicitly models the original magnitude of gene expression and the total effect of technical factors to produce the observed count distribution.
+
+Since disize jointly estimates the effect of covariates on gene expression and the batch effect, performing inference on the full model may be useful to combine normalization and differential expression quantification into a single step.
+Currently, coefficients for the covariates specified by the experimental design are thrown away as they are crude point estimates, and no uncertainty quantification is done on any parameters.
+Although the model is complex to fit due to the large number of features in transcriptomic experiments, variational inference methods may be suitable to approximate the posterior distribution efficiently. 
+This representation for the full model would allow differential expression analysis to be completed without an explicit normalization step, and allow uncertainty for the size factors to be quantified as well. 
+
 
 Although this work has mostly focused on bulk experiments, since disize allows for an arbitrary batch membership structure, normalization can be done directly with scRNA-seq data. 
 This approach leverages the fact that cells belonging to the same sample share a batch effect. 
 Consequently, using disize with tools specifically developed for DE testing in single-cell experiments—-- such as glmGamPoi \cite{ahlmann-eltze_glmgampoi_2021} --—a pseudo-bulking step can be avoided altogether. 
 However, a potential issue with the current implementation is that disize represents the count matrix in a dense format, which increases the memory footprint and may preclude its use with large datasets. 
 Future work could include allowing a sparse representation to be used, which would significantly reduce the memory requirements.
+
+
+
 
 \section*{Supporting information}
 
