@@ -436,7 +436,6 @@ Currently, coefficients for the covariates specified by the experimental design 
 Although the model is complex to fit due to the large number of features in transcriptomic experiments, variational inference methods may be suitable to approximate the posterior distribution efficiently. 
 This representation for the full model would allow differential expression analysis to be completed without an explicit normalization step, and allow uncertainty for the size factors to be quantified as well. 
 
-
 Although this work has mostly focused on bulk experiments, since disize allows for an arbitrary batch membership structure, normalization can be done directly with scRNA-seq data. 
 This approach leverages the fact that cells belonging to the same sample share a batch effect. 
 Consequently, using disize with tools specifically developed for DE testing in single-cell experiments—-- such as glmGamPoi \cite{ahlmann-eltze_glmgampoi_2021} --—a pseudo-bulking step can be avoided altogether. 

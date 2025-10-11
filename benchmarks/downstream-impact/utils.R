@@ -134,13 +134,13 @@ run_benchmark <- function(
                     errors <- lapply(levels(res_data$method), function(method) {
                         cur_data <- res_data[res_data$method == method, ]
 
-                        # Compute conditional type 1 error
+                        # Compute type 1 error
                         type_1 <- mean(
                             cur_data$p_values[cur_data$null] < 0.05,
                             na.rm = TRUE
                         )
 
-                        # Compute conditional type 2 error
+                        # Compute type 2 error
                         type_2 <- mean(
                             cur_data$p_values[!cur_data$null] > 0.05,
                             na.rm = TRUE
