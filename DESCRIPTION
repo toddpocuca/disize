@@ -2,7 +2,7 @@ Package: disize
 Title: Design Informed Size Factor Estimation
 Version: 0.8.0
 Authors@R:
-    person("Todd", "McCready", email = "175446079+toddmccready@users.noreply.github.com", role = c("aut", "cre"))
+    person("Todd", "Pocuca", email = "toddpocuca@gmail.com", role = c("aut", "cre"))
 Description: A tool for estimating size factors taking into account experimental design.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -31,6 +31,6 @@ Suggests:
     future.apply,
     ggplot2
 Config/testthat/edition: 3
-URL: https://toddmccready.github.io/disize/, https://github.com/toddmccready/disize
+URL: https://toddpocuca.github.io/disize/, https://github.com/toddpocuca/disize
 VignetteBuilder: knitr
 Config/Needs/website: rmarkdown
