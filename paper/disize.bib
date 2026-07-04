@@ -9,10 +9,10 @@
 	number = {6},
 	urldate = {2025-08-27},
 	journal = {Molecular Ecology},
+	publisher = {John Wiley \& Sons, Ltd},
 	author = {Todd, Erica V. and Black, Michael A. and Gemmell, Neil J.},
 	month = mar,
 	year = {2016},
-	note = {Publisher: John Wiley \& Sons, Ltd},
 	pages = {1224--1241},
 	file = {Full Text:/Users/todd/Zotero/storage/3IXB26IQ/Todd et al. - 2016 - The power and promise of RNA-seq in ecology and evolution.pdf:application/pdf},
 }
@@ -86,12 +86,6 @@
 	pages = {R25},
 }
 
-@misc{noauthor_moderated_nodate,
-	title = {Moderated statistical tests for assessing differences in tag abundance {\textbar} {Bioinformatics} {\textbar} {Oxford} {Academic}},
-	url = {https://academic.oup.com/bioinformatics/article/23/21/2881/372869},
-	urldate = {2025-08-27},
-}
-
 @article{li_choice_2020,
 	title = {Choice of library size normalization and statistical methods for differential gene expression analysis in balanced two-group comparisons for {RNA}-seq studies},
 	volume = {21},
@@ -134,11 +128,11 @@
 	abstract = {Transcription occurs in stochastic bursts. Early models based upon RNA hybridisation studies suggest bursting dynamics arise from alternating inactive and permissive states. Here we investigate bursting mechanism in live cells by quantitative imaging of actin gene transcription, combined with molecular genetics, stochastic simulation and probabilistic modelling. In contrast to early models, our data indicate a continuum of transcriptional states, with a slowly fluctuating initiation rate converting the gene between different levels of activity, interspersed with extended periods of inactivity. We place an upper limit of 40 s on the lifetime of fluctuations in elongation rate, with initiation rate variations persisting an order of magnitude longer. TATA mutations reduce the accessibility of high activity states, leaving the lifetime of on- and off-states unchanged. A continuum or spectrum of gene states potentially enables a wide dynamic range for cell responses to stimuli.},
 	urldate = {2025-09-17},
 	journal = {eLife},
+	publisher = {eLife Sciences Publications, Ltd},
 	author = {Corrigan, Adam M and Tunnacliffe, Edward and Cannon, Danielle and Chubb, Jonathan R},
 	editor = {Singer, Robert H},
 	month = feb,
 	year = {2016},
-	note = {Publisher: eLife Sciences Publications, Ltd},
 	keywords = {computational modelling, live cell imaging, single cell gene expression, stochastic gene expression, transcription, transcriptional bursting},
 	pages = {e13051},
 	file = {Full Text PDF:/Users/todd/Zotero/storage/4PF889J9/Corrigan et al. - 2016 - A continuum model of transcriptional bursting.pdf:application/pdf},
@@ -180,6 +174,7 @@
 
 @inproceedings{carvalho_handling_2009,
 	title = {Handling {Sparsity} via the {Horseshoe}},
+	issn = {1938-7228},
 	abstract = {This paper presents a general, fully Bayesian framework for sparse supervised-learning problems based on the horseshoe prior. The horseshoe prior is a member of the family of multivariate scale mixtures of normals, and is therefore closely related to widely used approaches for sparse Bayesian learning, including, among others, Laplacian priors (e.g. the LASSO) and Student-t priors (e.g. the relevance vector machine). The advantages of the horseshoe are its robustness at handling unknown sparsity and large outlying signals. These properties are justifed theoretically via a representation theorem and accompanied by comprehensive empirical experiments that compare its performance to benchmark alternatives.},
 	language = {en},
 	urldate = {2025-09-17},
@@ -188,7 +183,6 @@
 	author = {Carvalho, Carlos M. and Polson, Nicholas G. and Scott, James G.},
 	month = apr,
 	year = {2009},
-	note = {ISSN: 1938-7228},
 	pages = {73--80},
 	file = {Full Text PDF:/Users/todd/Zotero/storage/5FASBTAW/Carvalho et al. - 2009 - Handling Sparsity via the Horseshoe.pdf:application/pdf},
 }
@@ -211,4 +205,73 @@
 	year = {2021},
 	pages = {5701--5702},
 	file = {PDF:/Users/todd/Zotero/storage/DPUHEM8P/Ahlmann-Eltze and Huber - 2021 - glmGamPoi fitting Gamma-Poisson generalized linear models on single cell count data.pdf:application/pdf},
+}
+
+@article{blei_variational_2017,
+	title = {Variational {Inference}: {A} {Review} for {Statisticians}},
+	volume = {112},
+	issn = {0162-1459, 1537-274X},
+	shorttitle = {Variational {Inference}},
+	doi = {10.1080/01621459.2017.1285773},
+	abstract = {One of the core problems of modern statistics is to approximate difﬁcult-to-compute probability densities. This problem is especially important in Bayesian statistics, which frames all inference about unknown quantities as a calculation involving the posterior density. In this paper, we review variational inference (VI), a method from machine learning that approximates probability densities through optimization. VI has been used in many applications and tends to be faster than classical methods, such as Markov chain Monte Carlo sampling. The idea behind VI is to ﬁrst posit a family of densities and then to ﬁnd the member of that family which is close to the target. Closeness is measured by Kullback-Leibler divergence. We review the ideas behind mean-ﬁeld variational inference, discuss the special case of VI applied to exponential family models, present a full example with a Bayesian mixture of Gaussians, and derive a variant that uses stochastic optimization to scale up to massive data. We discuss modern research in VI and highlight important open problems. VI is powerful, but it is not yet well understood. Our hope in writing this paper is to catalyze statistical research on this class of algorithms.},
+	language = {en},
+	number = {518},
+	urldate = {2025-10-16},
+	journal = {Journal of the American Statistical Association},
+	author = {Blei, David M. and Kucukelbir, Alp and McAuliffe, Jon D.},
+	month = apr,
+	year = {2017},
+	pages = {859--877},
+	file = {PDF:/Users/todd/Zotero/storage/JEW74AJP/Blei et al. - 2017 - Variational Inference A Review for Statisticians.pdf:application/pdf},
+}
+
+@article{gerard_data-based_2020,
+	title = {Data-based {RNA}-seq simulations by binomial thinning},
+	volume = {21},
+	issn = {1471-2105},
+	doi = {10.1186/s12859-020-3450-9},
+	abstract = {Background
+With the explosion in the number of methods designed to analyze bulk and single-cell RNA-seq data, there is a growing need for approaches that assess and compare these methods. The usual technique is to compare methods on data simulated according to some theoretical model. However, as real data often exhibit violations from theoretical models, this can result in unsubstantiated claims of a method’s performance.
+
+Results
+Rather than generate data from a theoretical model, in this paper we develop methods to add signal to real RNA-seq datasets. Since the resulting simulated data are not generated from an unrealistic theoretical model, they exhibit realistic (annoying) attributes of real data. This lets RNA-seq methods developers assess their procedures in non-ideal (model-violating) scenarios. Our procedures may be applied to both single-cell and bulk RNA-seq. We show that our simulation method results in more realistic datasets and can alter the conclusions of a differential expression analysis study. We also demonstrate our approach by comparing various factor analysis techniques on RNA-seq datasets.
+
+Conclusions
+Using data simulated from a theoretical model can substantially impact the results of a study. We developed more realistic simulation techniques for RNA-seq data. Our tools are available in the seqgendiff R package on the Comprehensive R Archive Network: https://cran.r-project.org/package=seqgendiff.},
+	urldate = {2026-06-08},
+	journal = {BMC Bioinformatics},
+	author = {Gerard, David},
+	month = may,
+	year = {2020},
+	pages = {206},
+	file = {Full Text:/Users/todd/Zotero/storage/X54K44ZM/Gerard - 2020 - Data-based RNA-seq simulations by binomial thinning.pdf:application/pdf},
+}
+
+@misc{10x_genomics_10k_2020,
+	title = {10k {Peripheral} {Blood} {Mononuclear} {Cells} ({PBMCs}) from a {Healthy} {Donor} ({Single} {Indexed} v3.1 {Chemistry})},
+	url = {https://www.10xgenomics.com/datasets/10-k-peripheral-blood-mononuclear-cells-pbm-cs-from-a-healthy-donor-single-indexed-3-1-standard-4-0-0},
+	urldate = {2026-06-02},
+	author = {10x Genomics},
+	month = jul,
+	year = {2020},
+}
+
+@article{kang_multiplexed_2018,
+	title = {Multiplexed droplet single-cell {RNA}-sequencing using natural genetic variation},
+	volume = {36},
+	copyright = {2017 Springer Nature America, Inc.},
+	issn = {1546-1696},
+	doi = {10.1038/nbt.4042},
+	abstract = {Droplet single-cell RNA-seq is applied to large numbers of pooled samples from unrelated individuals.},
+	language = {en},
+	number = {1},
+	urldate = {2026-06-30},
+	journal = {Nature Biotechnology},
+	publisher = {Nature Publishing Group},
+	author = {Kang, Hyun Min and Subramaniam, Meena and Targ, Sasha and Nguyen, Michelle and Maliskova, Lenka and McCarthy, Elizabeth and Wan, Eunice and Wong, Simon and Byrnes, Lauren and Lanata, Cristina M. and Gate, Rachel E. and Mostafavi, Sara and Marson, Alexander and Zaitlen, Noah and Criswell, Lindsey A. and Ye, Chun Jimmie},
+	month = jan,
+	year = {2018},
+	keywords = {Genome informatics, Transcriptomics},
+	pages = {89--94},
+	file = {Full Text PDF:/Users/todd/Zotero/storage/FGU96AZ8/Kang et al. - 2018 - Multiplexed droplet single-cell RNA-sequencing using natural genetic variation.pdf:application/pdf},
 }

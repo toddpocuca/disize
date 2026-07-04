@@ -8,7 +8,7 @@ split_formula <- function(design_formula) {
 
     # Separate fixed- and random-effects terms
     fixed <- NULL
-    if (any(!re)) {
+    if (!all(re)) {
         fixed <- stats::formula(
             paste0(" ~ 0 + ", paste(terms[!re], collapse = " + "))
         )
@@ -29,16 +29,16 @@ split_formula <- function(design_formula) {
 }
 
 # Get disize's size factor estimate
-get_disize <- function(dataset, design_formula, n_threads = 1L) {
+get_disize <- function(dataset, design_formula, n_threads = 1L, n_feats = 10000L, verbose = 1L) {
     disize_sf <- disize::disize(
         design_formula,
         dataset$counts,
         dataset$metadata,
         "batch_id",
-        n_feats = ncol(dataset$counts),
+        n_feats = n_feats,
         n_threads = n_threads,
-        rel_tol = 500,
-        verbose = 1L
+        rel_tol = 1000,
+        verbose = verbose
     )
 
     disize_sf

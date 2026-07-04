@@ -80,7 +80,7 @@ simulate_dataset <- function(
 }
 
 # Run a benchmark with specified simulation settings
-run_benchmark <- function(n_sims, sim_pars, design_formula, metadata) {
+run_benchmark <- function(n_sims, sim_pars, design_formula, metadata, disize_threads = 1L) {
     benchmark <- sim_pars |>
         dplyr::mutate(
             d = purrr::pmap(
@@ -106,11 +106,11 @@ run_benchmark <- function(n_sims, sim_pars, design_formula, metadata) {
                             )
 
                             # Estimate size factors
-                            disize_sf <- get_disize(dataset, design_formula, 2L)
+                            disize_sf <- get_disize(dataset, design_formula, disize_threads)
                             mor_sf <- get_mor(dataset)
                             tmm_sf <- get_tmm(dataset)
 
-                            # Compute error on log-scale
+                            # Compute absolute error on log-scale
                             tibble::tibble(
                                 disize = (dataset$size_factors - disize_sf)^2,
                                 mor = (dataset$size_factors - mor_sf)^2,
@@ -132,28 +132,50 @@ run_benchmark <- function(n_sims, sim_pars, design_formula, metadata) {
                 }
             )
         ) |>
-        tidyr::unnest(d) |>
-        # Map to relative error
-        dplyr::mutate(
-            mor = mor / disize,
-            tmm = tmm / disize,
-            disize = disize / disize
-        ) |>
-        tidyr::pivot_longer(
-            cols = c(disize, mor, tmm),
-            names_to = "comparison",
-            values_to = "relative_error"
-        ) |>
-        dplyr::group_by(setting_id, comparison) |>
-        dplyr::mutate(
-            q95 = quantile(relative_error, 0.95),
-            q75 = quantile(relative_error, 0.75),
-            q60 = quantile(relative_error, 0.60),
-            q50 = quantile(relative_error, 0.50),
-            q40 = quantile(relative_error, 0.40),
-            q25 = quantile(relative_error, 0.25),
-            q5 = quantile(relative_error, 0.05)
+        tidyr::unnest(d)
+
+    # Compute absolute error
+    abs_benchmark <- tidyr::pivot_longer(benchmark,
+        cols = c(disize, mor, tmm),
+        names_to = "method",
+        values_to = "error"
+    ) |>
+        dplyr::group_by(n_genes, sparsity, mgt, avg, setting_id, method) |>
+        dplyr::summarise(
+            q95 = quantile(error, 0.95),
+            q75 = quantile(error, 0.75),
+            q60 = quantile(error, 0.60),
+            q50 = quantile(error, 0.50),
+            q40 = quantile(error, 0.40),
+            q25 = quantile(error, 0.25),
+            q5 = quantile(error, 0.05),
+            type = "absolute"
         )
 
-    benchmark
+    # Compute relative error
+    rel_benchmark <- dplyr::mutate(benchmark,
+        mor = mor / disize,
+        tmm = tmm / disize,
+        disize = disize / disize
+    ) |>
+        tidyr::pivot_longer(
+            cols = c(disize, mor, tmm),
+            names_to = "method",
+            values_to = "error"
+        ) |>
+        dplyr::group_by(n_genes, sparsity, mgt, avg, setting_id, method) |>
+        dplyr::summarise(
+            q95 = quantile(error, 0.95),
+            q75 = quantile(error, 0.75),
+            q60 = quantile(error, 0.60),
+            q50 = quantile(error, 0.50),
+            q40 = quantile(error, 0.40),
+            q25 = quantile(error, 0.25),
+            q5 = quantile(error, 0.05),
+            type = "relative"
+        )
+
+
+    # Combine dataframes
+    benchmark <- dplyr::bind_rows(abs_benchmark, rel_benchmark)
 }

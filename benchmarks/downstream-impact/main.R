@@ -4,8 +4,17 @@ library(future)
 library(future.apply)
 source("benchmarks/downstream-impact/utils.R")
 
+# Settings ----
+set.seed(67)
+
+# Number of (logical) cores available
+n_cores <- parallel::detectCores()
+
+# Number of threads used by disize
+disize_threads <- 2L
+
 # Create cluster
-cl <- parallel::makeCluster(parallel::detectCores() / 2L - 1L)
+cl <- parallel::makeCluster(n_cores %/% disize_threads)
 
 # Configure library paths and export needed functions to cluster
 main_lib_paths <- .libPaths()
@@ -36,14 +45,14 @@ parallel::clusterEvalQ(cl, {
 future::plan(future::cluster, workers = cl)
 
 # Number of simulations
-n_sims <- 30L
+n_sims <- 100L
 
 # Configure simulation settings
 sim_pars <- expand.grid(
     "n_genes" = c(10000L),
     "sparsity" = c(0.15, 0.20, 0.25),
     "mgt" = c(2),
-    "avg" = c(10.0, 25, 50, 75, 100.0)
+    "avg" = c(10.0, 25, 50, 75, 100, 500, 1000)
 ) |>
     tibble::rowid_to_column("setting_id")
 

@@ -38,7 +38,8 @@ split_formula <- function(design_formula) {
 #' @param counts A (observation x feature) count matrix.
 #' @param metadata A dataframe containing observation-level metadata.
 #' @param batch_name The identifier for the batch column in 'metadata'.
-#' @param obs_name The identifier for the observation column in 'metadata'.
+#' @param offset An optional offset used to adjust expression estimates for each observation.
+#' @param obs_name The identifier for the observation column in 'metadata' (useful if count matrix and metadata do not share ordering).
 #' @param n_feats The number of features used during estimation.
 #' @param n_iters The number of iterations used for estimation.
 #' @param rel_tol The relative tolerance used for convergence.
@@ -59,6 +60,7 @@ disize <- function(
     counts,
     metadata,
     batch_name,
+    offset = NULL,
     obs_name = "obs_id",
     n_feats = min(10000L, ncol(counts)),
     n_iters = 10000L,
@@ -83,6 +85,13 @@ disize <- function(
         )
     }
 
+    # Check offset has the same number of elements
+    if (!is.null(offset) && length(offset) != nrow(counts)) {
+        stop(
+            "'offset' and 'counts' must have the same # of observations."
+        )
+    }
+
     # Formatting Data ----
     if (3L <= verbose) {
         message("Formatting data...")
@@ -103,7 +112,7 @@ disize <- function(
         colnames(counts) <- seq_len(ncol(counts))
     }
 
-    # Re-order counts
+    # Re-order counts to match metadata (if needed)
     counts <- counts[metadata[[obs_name]], ]
 
     # Filter out features with no counts
@@ -127,18 +136,25 @@ disize <- function(
     ordering <- order(Matrix::colMeans(counts), decreasing = TRUE)
     counts <- counts[, ordering[1:n_feats]]
 
-    # Cast to dense matrix
-    if (methods::is(counts, "sparseMatrix")) {
-        counts <- base::as.matrix(counts)
-    }
+    # Cast to dense matrix if needed
+    counts <- base::as.matrix(counts)
 
     # Ensure batch identifier is a factor variable
     metadata[[batch_name]] <- as.factor(metadata[[batch_name]])
 
-    # Allocate data for Stan
+    # Allocate data for Stan ----
     stan_data <- list(n_obs = nrow(counts), n_feats = ncol(counts))
-    stan_data[["n_batches"]] <- length(levels(metadata[[batch_name]]))
+    stan_data[["n_batches"]] <- nlevels(metadata[[batch_name]])
     stan_data[["batch_id"]] <- as.integer(metadata[[batch_name]])
+
+    # Include offsets if necessary
+    if (!is.null(offset)) {
+        stan_data[["n_of"]] <- stan_data$n_obs
+        stan_data[["offsets"]] <- offset
+    } else {
+        stan_data[["n_of"]] <- 0L
+        stan_data[["offsets"]] <- array(0, dim = c(0))
+    }
 
     # Split the design formula into fixed- and random-effects
     design <- split_formula(design_formula)
@@ -194,7 +210,7 @@ disize <- function(
     }
 
     # Include counts and grainsize for Stan
-    stan_data[["counts"]] <- Matrix::t(counts)
+    stan_data[["counts"]] <- base::t(counts)
     stan_data[["grainsize"]] <- ceiling(
         stan_data[["n_feats"]] / n_threads
     )
