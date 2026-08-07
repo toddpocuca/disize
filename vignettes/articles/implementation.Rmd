@@ -9,48 +9,40 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
+
 ```
 
-Internally, `disize` uses Stan to fit a Bayesian model that jointly estimates the effect of covariates (structured according to `design_formula`) on gene expression *and* any confounding batch-effects:
+`disize` uses the L-BFGS algorithm offered in the probabilistic programming language Stan to find the maximum *a posteriori* (MAP) of a Bayesian model that jointly estimates the effect of covariates (structured according to the experimental design) on gene expression and the batch effect.
+
+The model can be described as a modification of a simpler generalized linear mixed model with offsets:
 
 $$\begin{aligned}
-    \mathbf{y}_g &\sim \text{NegBinom}(\mathbf{\mu}_g, \phi) \\
-    \log \mathbf{\mu}_g &= \mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g + \mathbf{o} \\
-        &= \mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g + (\mathbf{B} \mathbf{s}) \\
-    \mathbf{b}_g &\sim \text{Normal}(\mathbf{0}, \mathbf{G}_g)
+y_{i,g} &\sim \text{NegBinom}(\mu_{i,g}, \phi) \\
+\log \mu_{i,g} &= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g + \log s_{\mathbf{m}[i]} + o_i
 \end{aligned}$$
 
-Where $\mathbf{y}_g$ denotes the vector of counts of a gene $g$ for all observations, which is realized from the negative binomial parameterized by the effect of the covariates ($\mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g$) and any batch-effects ($\mathbf{B} \mathbf{s}$).
+where $y_{i,g}$ denotes the observed count for a sample $i$ and gene $g$. The count is realized from a negative binomial with a mean described by the effect of the covariates $\alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g$ (structured according to the experimental design), any specified offset $o_i$ adjusting for known variation, the batch effect $s_{\mathbf{m}[i]}$, structured according to the batch membership $\mathbf{m}$, and a shared inverse overdispersion factor $\phi$. Here, the inverse overdispersion factor $\phi$ is completely pooled across genes rather than estimated per-gene ($\phi_g$) as an approximation to reduce model complexity.
 
-The experimental design is specified by an R formula (`design_formula`) that constructs a "fixed-effects" model matrix $\mathbf{X}$ (without an intercept) and a "random-effects" model matrix $\mathbf{Z}$; this by itself is a regular GLMM.
+Since the size factors $\mathbf{s}$ are unobserved (and thus different from true offsets), this model is not identifiable for most experimental designs: we cannot distinguish between batch and biology.
+This problem is overcome by constraining $\mathbf{s}$ to sum to the total number of batches, and assuming only a subset of features are affected by the covariates measured in the experiment.
+In other words, the estimated coefficients $\mathbf{\beta}_g, \mathbf{b}_g$ (excluding the intercept) are *sparse* across genes.
 
-The confounding batch-effect is essentially an unknown "offset" (not in the literal sense as it is being estimated) $\mathbf{o} = \mathbf{B} \mathbf{s}$, where $\mathbf{B}$ specifies the batch membership for each observation and $\mathbf{s}$ contains the "size factors" which scale the true magnitude of expression.
-
-At its face, however, this model should not be joint identifiable for most experimental designs (often the batch ID is perfectly collinear with a measured covariate).
-This is overcome by constraining $\mathbf{s}$ and assuming only a fraction of features are significantly affected by the covariates measured in the experiment;
-in other words, the estimated coefficients $\mathbf{\beta}_g, \mathbf{b}_g$ (excluding the intercept) are *sparse* across genes.
-
-This assumption is encoded in the model by placing distinct horseshoe priors on each of the model coefficients (both the fixed- and random-effects).
-This allows the priors to be learned independently of each other using the large number of features measured in RNAseq experiments:
+We encode this assumption by placing separate horseshoe priors on each of the model coefficients.
+This structure allows different degrees of sparsity for each predictor:
 
 $$\begin{aligned}
-    \mathbf{y}_g &\sim \text{NegBinom}(\mathbf{\mu}_g, \phi) \\
-    \log \mathbf{\mu}_g &= \mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g + \mathbf{o} \\
-        &= \mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g + (\mathbf{M} \mathbf{s}) \\
-    \mathbf{\beta}_g &\sim \text{Normal}(\mathbf{0}, \mathbf{\lambda}_g^{(f)} \odot \mathbf{\tau}^{(f)}) \\
-    \mathbf{\lambda}_g^{(f)} &\sim \text{Half-Cauchy}(\mathbf{0}, \mathbf{1}) \\
-    \mathbf{b}_g &\sim \text{Normal}(\mathbf{0}, \mathbf{R} [ \mathbf{\lambda}_g^{(r)} \odot \mathbf{\tau}^{(r)} ]) \\
-    \mathbf{\lambda}_g^{(r)} &\sim \text{Half-Cauchy}(\mathbf{0}, \mathbf{1}) \\
-    \mathbf{1} \cdot \exp(\mathbf{s}) &= n_b
+y_{i,g} &\sim \text{NegBinom}(\mu_{i,g}, \phi) \\
+\log \mu_{i,g} &= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g + \mathbf{z}_i \mathbf{b}_g + \log s_{\mathbf{m}[i]} + o_i \\
+\beta_{p,g} &\sim \text{Normal}(0, \lambda_{p,g}^{(f)} \tau_{p}^{(f)}) \\
+\lambda_{p,g}^{(f)} &\sim \text{Half-Cauchy}(0, 1) \\
+b_{k,g} &\sim \text{Normal}(0, \lambda_{\mathbf{r}[k], g}^{(r)} \tau_{\mathbf{r}[k]}^{(r)}) \\
+\lambda_{j, g}^{(r)} &\sim \text{Half-Cauchy}(0, 1) \\
+\mathbf{1}^\top \mathbf{s} &= n_B
 \end{aligned}$$
 
-Where $\mathbf{R}$ specifies the random-effects term membership for each random-effect coefficient, and $n_b$ denotes the number of batches.
+where $p$ indexes the fixed-effect coefficients, $k$ indexes the random-effect coefficients, $j$ indexes distinct random-effect terms, and $\mathbf{r}$ denotes the term membership structure for the random-effect coefficients.
 
-## Estimation
-
-Since the posterior distribution for $\mathbf{s}$ is heavily concentrated for typical datasets with thousands of features, it is sufficient to quickly provide a point estimate of $\mathbf{s}$ and delegate estimation of the model coefficients to existing tools like `DESeq2` or `edgeR` (only replacing the small normalization step of their workflows).
-
-`disize` uses Stan's [L-BFGS optimization algorithm](https://mc-stan.org/docs/reference-manual/optimization.html) to find the model's *maximum a posteriori* (MAP) for $\mathbf{s}$.
+The Stan implementation splits the data and parameter matrices into chunks gene-wise in order to evaluate all distribution statements in parallel.

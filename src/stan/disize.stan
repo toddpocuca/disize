@@ -14,6 +14,8 @@ functions {
     array[] int re_design_p,
     array[] int re_id,
     array[] int batch_id,
+    int n_of,
+    vector offsets,
     vector intercept,
     matrix raw_fe_coefs,
     matrix raw_re_coefs,
@@ -48,6 +50,11 @@ functions {
       // Effect from the experimental design
       log_mu = rep_vector(intercept[feat_i], n_obs);
       
+      // Include offset if specified:
+      if (n_of != 0) {
+        log_mu += offsets;
+      }
+
       // Fixed-effects
       if (n_fe != 0) {
         log_mu += fe_design * (
@@ -85,7 +92,11 @@ data {
   int<lower=0> n_nz_re; // # of nonzero elements in the random-effects design matrix
   int<lower=0> n_re_terms; // # of random-effects terms
   int<lower=1> n_batches; // # of batches
+  int<lower=0> n_of; // # of offsets
   
+  // Offsets ----
+  vector[n_of] offsets;
+
   // Design Matrices ----
   // fixed-effects
   matrix[n_obs, n_fe] fe_design;
@@ -144,6 +155,8 @@ model {
     re_design_p,
     re_id,
     batch_id,
+    n_of,
+    offsets,
     intercept,
     raw_fe_coefs,
     raw_re_coefs,
