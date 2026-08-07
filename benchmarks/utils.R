@@ -8,7 +8,7 @@ split_formula <- function(design_formula) {
 
     # Separate fixed- and random-effects terms
     fixed <- NULL
-    if (any(!re)) {
+    if (!all(re)) {
         fixed <- stats::formula(
             paste0(" ~ 0 + ", paste(terms[!re], collapse = " + "))
         )
@@ -28,17 +28,22 @@ split_formula <- function(design_formula) {
     )
 }
 
+# Normalize size factors
+normalize_sf <- function(sf) {
+    log(sf / sum(sf) * length(sf))
+}
+
 # Get disize's size factor estimate
-get_disize <- function(dataset, design_formula, n_threads = 1L) {
+get_disize <- function(dataset, design_formula, n_threads = 1L, n_feats = 10000L, verbose = 1L) {
     disize_sf <- disize::disize(
         design_formula,
         dataset$counts,
         dataset$metadata,
         "batch_id",
-        n_feats = ncol(dataset$counts),
+        n_feats = n_feats,
         n_threads = n_threads,
-        rel_tol = 500,
-        verbose = 1L
+        rel_tol = 1000,
+        verbose = verbose
     )
 
     disize_sf
@@ -57,7 +62,7 @@ get_mor <- function(dataset) {
     deseq2_sf <- DESeq2::sizeFactors(dds)
 
     # Scale for comparisons
-    deseq2_sf <- log(deseq2_sf / sum(deseq2_sf) * length(deseq2_sf))
+    deseq2_sf <- normalize_sf(deseq2_sf)
 
     deseq2_sf
 }
@@ -71,7 +76,7 @@ get_tmm <- function(dataset) {
     edger_sf <- dds$samples$norm.factors * Matrix::rowSums(dataset$counts)
 
     # Scale for comparisons
-    edger_sf <- log(edger_sf / sum(edger_sf) * length(edger_sf))
+    edger_sf <- normalize_sf(edger_sf)
 
     edger_sf
 }
