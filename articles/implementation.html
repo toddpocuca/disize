@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">disize</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,76 +68,62 @@
 
     
     
-<p>Internally, <code>disize</code> uses Stan to fit a Bayesian model
-that jointly estimates the effect of covariates (structured according to
-<code>design_formula</code>) on gene expression <em>and</em> any
-confounding batch-effects:</p>
+<p><code>disize</code> uses the L-BFGS algorithm offered in the
+probabilistic programming language Stan to find the maximum <em>a
+posteriori</em> (MAP) of a Bayesian model that jointly estimates the
+effect of covariates (structured according to the experimental design)
+on gene expression and the batch effect.</p>
+<p>The model can be described as a modification of a simpler generalized
+linear mixed model with offsets:</p>
 <p><span class="math display">\begin{aligned}
-    \mathbf{y}_g &amp;\sim \text{NegBinom}(\mathbf{\mu}_g, \phi) \\
-    \log \mathbf{\mu}_g &amp;= \mathbf{\alpha}_g + \mathbf{X}
-\mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g + \mathbf{o} \\
-        &amp;= \mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g +
-\mathbf{Z}\mathbf{b}_g + (\mathbf{B} \mathbf{s}) \\
-    \mathbf{b}_g &amp;\sim \text{Normal}(\mathbf{0}, \mathbf{G}_g)
+y_{i,g} &amp;\sim \text{NegBinom}(\mu_{i,g}, \phi) \\
+\log \mu_{i,g} &amp;= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g +
+\mathbf{z}_i \mathbf{b}_g + \log s_{\mathbf{m}[i]} + o_i
 \end{aligned}</span></p>
-<p>Where <span class="math inline">\mathbf{y}_g</span> denotes the
-vector of counts of a gene <span class="math inline">g</span> for all
-observations, which is realized from the negative binomial parameterized
-by the effect of the covariates (<span class="math inline">\mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g +
-\mathbf{Z}\mathbf{b}_g</span>) and any batch-effects (<span class="math inline">\mathbf{B} \mathbf{s}</span>).</p>
-<p>The experimental design is specified by an R formula
-(<code>design_formula</code>) that constructs a “fixed-effects” model
-matrix <span class="math inline">\mathbf{X}</span> (without an
-intercept) and a “random-effects” model matrix <span class="math inline">\mathbf{Z}</span>; this by itself is a regular
-GLMM.</p>
-<p>The confounding batch-effect is essentially an unknown “offset” (not
-in the literal sense as it is being estimated) <span class="math inline">\mathbf{o} = \mathbf{B} \mathbf{s}</span>, where
-<span class="math inline">\mathbf{B}</span> specifies the batch
-membership for each observation and <span class="math inline">\mathbf{s}</span> contains the “size factors” which
-scale the true magnitude of expression.</p>
-<p>At its face, however, this model should not be joint identifiable for
-most experimental designs (often the batch ID is perfectly collinear
-with a measured covariate). This is overcome by constraining <span class="math inline">\mathbf{s}</span> and assuming only a fraction of
-features are significantly affected by the covariates measured in the
-experiment; in other words, the estimated coefficients <span class="math inline">\mathbf{\beta}_g, \mathbf{b}_g</span> (excluding the
-intercept) are <em>sparse</em> across genes.</p>
-<p>This assumption is encoded in the model by placing distinct horseshoe
-priors on each of the model coefficients (both the fixed- and
-random-effects). This allows the priors to be learned independently of
-each other using the large number of features measured in RNAseq
-experiments:</p>
+<p>where <span class="math inline">y_{i,g}</span> denotes the observed
+count for a sample <span class="math inline">i</span> and gene <span class="math inline">g</span>. The count is realized from a negative
+binomial with a mean described by the effect of the covariates <span class="math inline">\alpha_g + \mathbf{x}_i \mathbf{\beta}_g +
+\mathbf{z}_i \mathbf{b}_g</span> (structured according to the
+experimental design), any specified offset <span class="math inline">o_i</span> adjusting for known variation, the batch
+effect <span class="math inline">s_{\mathbf{m}[i]}</span>, structured
+according to the batch membership <span class="math inline">\mathbf{m}</span>, and a shared inverse
+overdispersion factor <span class="math inline">\phi</span>. Here, the
+inverse overdispersion factor <span class="math inline">\phi</span> is
+completely pooled across genes rather than estimated per-gene (<span class="math inline">\phi_g</span>) as an approximation to reduce model
+complexity.</p>
+<p>Since the size factors <span class="math inline">\mathbf{s}</span>
+are unobserved (and thus different from true offsets), this model is not
+identifiable for most experimental designs: we cannot distinguish
+between batch and biology. This problem is overcome by constraining
+<span class="math inline">\mathbf{s}</span> to sum to the total number
+of batches, and assuming only a subset of features are affected by the
+covariates measured in the experiment. In other words, the estimated
+coefficients <span class="math inline">\mathbf{\beta}_g,
+\mathbf{b}_g</span> (excluding the intercept) are <em>sparse</em> across
+genes.</p>
+<p>We encode this assumption by placing separate horseshoe priors on
+each of the model coefficients. This structure allows different degrees
+of sparsity for each predictor:</p>
 <p><span class="math display">\begin{aligned}
-    \mathbf{y}_g &amp;\sim \text{NegBinom}(\mathbf{\mu}_g, \phi) \\
-    \log \mathbf{\mu}_g &amp;= \mathbf{\alpha}_g + \mathbf{X}
-\mathbf{\beta}_g + \mathbf{Z}\mathbf{b}_g + \mathbf{o} \\
-        &amp;= \mathbf{\alpha}_g + \mathbf{X} \mathbf{\beta}_g +
-\mathbf{Z}\mathbf{b}_g + (\mathbf{M} \mathbf{s}) \\
-    \mathbf{\beta}_g &amp;\sim \text{Normal}(\mathbf{0},
-\mathbf{\lambda}_g^{(f)} \odot \mathbf{\tau}^{(f)}) \\
-    \mathbf{\lambda}_g^{(f)} &amp;\sim \text{Half-Cauchy}(\mathbf{0},
-\mathbf{1}) \\
-    \mathbf{b}_g &amp;\sim \text{Normal}(\mathbf{0}, \mathbf{R} [
-\mathbf{\lambda}_g^{(r)} \odot \mathbf{\tau}^{(r)} ]) \\
-    \mathbf{\lambda}_g^{(r)} &amp;\sim \text{Half-Cauchy}(\mathbf{0},
-\mathbf{1}) \\
-    \mathbf{1} \cdot \exp(\mathbf{s}) &amp;= n_b
+y_{i,g} &amp;\sim \text{NegBinom}(\mu_{i,g}, \phi) \\
+\log \mu_{i,g} &amp;= \alpha_g + \mathbf{x}_i \mathbf{\beta}_g +
+\mathbf{z}_i \mathbf{b}_g + \log s_{\mathbf{m}[i]} + o_i \\
+\beta_{p,g} &amp;\sim \text{Normal}(0, \lambda_{p,g}^{(f)}
+\tau_{p}^{(f)}) \\
+\lambda_{p,g}^{(f)} &amp;\sim \text{Half-Cauchy}(0, 1) \\
+b_{k,g} &amp;\sim \text{Normal}(0, \lambda_{\mathbf{r}[k], g}^{(r)}
+\tau_{\mathbf{r}[k]}^{(r)}) \\
+\lambda_{j, g}^{(r)} &amp;\sim \text{Half-Cauchy}(0, 1) \\
+\mathbf{1}^\top \mathbf{s} &amp;= n_B
 \end{aligned}</span></p>
-<p>Where <span class="math inline">\mathbf{R}</span> specifies the
-random-effects term membership for each random-effect coefficient, and
-<span class="math inline">n_b</span> denotes the number of batches.</p>
-<div class="section level2">
-<h2 id="estimation">Estimation<a class="anchor" aria-label="anchor" href="#estimation"></a>
-</h2>
-<p>Since the posterior distribution for <span class="math inline">\mathbf{s}</span> is heavily concentrated for
-typical datasets with thousands of features, it is sufficient to quickly
-provide a point estimate of <span class="math inline">\mathbf{s}</span>
-and delegate estimation of the model coefficients to existing tools like
-<code>DESeq2</code> or <code>edgeR</code> (only replacing the small
-normalization step of their workflows).</p>
-<p><code>disize</code> uses Stan’s <a href="https://mc-stan.org/docs/reference-manual/optimization.html" class="external-link">L-BFGS
-optimization algorithm</a> to find the model’s <em>maximum a
-posteriori</em> (MAP) for <span class="math inline">\mathbf{s}</span>.</p>
-</div>
+<p>where <span class="math inline">p</span> indexes the fixed-effect
+coefficients, <span class="math inline">k</span> indexes the
+random-effect coefficients, <span class="math inline">j</span> indexes
+distinct random-effect terms, and <span class="math inline">\mathbf{r}</span> denotes the term membership
+structure for the random-effect coefficients.</p>
+<p>The Stan implementation splits the data and parameter matrices into
+chunks gene-wise in order to evaluate all distribution statements in
+parallel.</p>
   </main>
 </div>
 
