@@ -23,15 +23,15 @@ suppressPackageStartupMessages({
 # Plot benchmarks
 plot_benchmark <- function(benchmark, title, design_formula) {
     the_plot <- ggplot(
-        data = benchmark |> dplyr::filter(comparison != "disize"),
+        data = benchmark |> dplyr::filter(method != "disize"),
         mapping = aes(
             x = avg,
-            fill = comparison
+            fill = method
         )
     ) +
         geom_ribbon(aes(ymin = q5, ymax = q95), alpha = 0.1) +
         geom_ribbon(aes(ymin = q40, ymax = q60), alpha = 0.2) +
-        geom_line(aes(x = avg, y = q50, color = comparison)) +
+        geom_line(aes(x = avg, y = q50, color = method)) +
         scale_y_log10() +
         facet_wrap(
             ncol = 2,
@@ -202,11 +202,11 @@ benchmark <- read.table(
     header = TRUE
 ) |>
     dplyr::mutate(
-        comparison = dplyr::case_match(
-            comparison,
+        method = dplyr::case_match(
+            method,
             "mor" ~ "MoR (DESeq/DESeq2)",
             "tmm" ~ "TMM (edgeR)",
-            .default = comparison
+            .default = method
         )
     )
 plot_benchmark(benchmark, "A Trivial Setting", ~ (1 | donor_id))
@@ -222,11 +222,11 @@ benchmark <- read.table(
     header = TRUE
 ) |>
     dplyr::mutate(
-        comparison = dplyr::case_match(
-            comparison,
+        method = dplyr::case_match(
+            method,
             "mor" ~ "MoR (DESeq/DESeq2)",
             "tmm" ~ "TMM (edgeR)",
-            .default = comparison
+            .default = method
         )
     )
 plot_benchmark(
@@ -245,11 +245,11 @@ benchmark <- read.table(
     header = TRUE
 ) |>
     dplyr::mutate(
-        comparison = dplyr::case_match(
-            comparison,
+        method = dplyr::case_match(
+            method,
             "mor" ~ "MoR (DESeq/DESeq2)",
             "tmm" ~ "TMM (edgeR)",
-            .default = comparison
+            .default = method
         )
     )
 plot_benchmark(
