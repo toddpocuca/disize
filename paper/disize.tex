@@ -238,7 +238,7 @@ This may be inefficient in experiments with large-scale systematic expression ch
 Here, we introduce design-informed size factor estimation (\texttt{disize}), a normalization method that uses information from the experimental design to improve accuracy. 
 \texttt{disize} uses a modified generalized linear mixed model to robustly distinguish between biological signal and sample-specific size factors. 
 We also propose a mechanistically justified data-generating process for RNA-sequencing counts that is derived from previous models of transcription and sequencing. 
-Through simulations based on this data-generating process and validating on true RNA-seq data, we demonstrate that \texttt{disize} recovers size factors more accurately than existing methods, particularly in challenging scenarios with low gene expression and a high proportion of differentially expressed genes; this in turn improves downstream analysis. 
+Through simulations based on this data-generating process and validating on true RNA-seq data, we show that \texttt{disize} recovers size factors more accurately than existing methods, particularly in challenging scenarios with low gene expression and a high proportion of differentially expressed genes; this in turn improves downstream analysis. 
 \texttt{disize} provides a robust and accurate approach to normalization, highlighting the significant benefits of integrating experimental design information directly into normalization for transcriptomic datasets.
 % Please keep the Author Summary between 150 and 200 words. Use first person.
 % PLOS ONE, PLOS Biology, PLOS Global Public Health, PLOS Mental Health, and PLOS Water authors please skip this step. Author Summary is not valid for submissions to these journals.
@@ -263,18 +263,18 @@ This improved normalization yields more reliable downstream results in different
 
 % Use "Eq" instead of "Equation" for equation citations.
 \section*{Introduction}
-The falling costs of high-throughput sequencing over the last decade have led to an increase in the number of transcriptomic experiments, with applications in various fields ranging from oncology \cite{hong_rna_2020} to ecology \cite{todd_power_2016}. 
+The falling costs of high-throughput sequencing over the last decade have led to an increase in the number of transcriptomic experiments, with applications in various fields ranging from oncology \cite{hongRNASequencingNew2020} to ecology \cite{toddPowerPromiseRNAseq2016}. 
 This surge in data has in turn driven the development of statistical models to analyze the resulting RNA sequencing (RNA-seq) data. 
-Among the most widely used tools for RNA-seq analysis are DESeq \cite{anders_differential_2010}, its successor DESeq2 \cite{love_moderated_2014}, and edgeR \cite{robinson_edger_2010}, all of which provide flexible frameworks for quantifying differential expression (DE).
+Among the most widely used tools for RNA-seq analysis are DESeq \cite{andersDifferentialExpressionAnalysis2010}, its successor DESeq2 \cite{loveModeratedEstimationFold2014}, and edgeR \cite{robinsonEdgeRBioconductorPackage2010}, all of which provide flexible frameworks for quantifying differential expression (DE).
 
 Although DESeq and edgeR have evolved considerably since their inception, this progress has largely focused on refining downstream DE testing methodology.
-However, the accuracy of DE analysis fundamentally depends on proper normalization, as technical biases from factors like library preparation, sequencing depth, and RNA composition can distort results \cite{robinson_scaling_2010}. 
-To address these biases, both tools rely on default normalization methods---the median-of-ratios (MoR) \cite{anders_differential_2010} in DESeq/DESeq2 and the trimmed mean of M-values (TMM) \cite{robinson_scaling_2010} in edgeR---that assume most genes are not differentially expressed across samples \cite{anders_differential_2010,robinson_scaling_2010}. 
+However, the accuracy of DE analysis fundamentally depends on proper normalization, as technical biases from factors like library preparation, sequencing depth, and RNA composition can distort results \cite{robinsonScalingNormalizationMethod2010}. 
+To address these biases, both tools rely on default normalization methods---the median-of-ratios (MoR) \cite{andersDifferentialExpressionAnalysis2010} in DESeq/DESeq2 and the trimmed mean of M-values (TMM) \cite{robinsonScalingNormalizationMethod2010} in edgeR---that assume most genes are not differentially expressed across samples \cite{andersDifferentialExpressionAnalysis2010,robinsonScalingNormalizationMethod2010}. 
 However, this assumption may sometimes be violated strongly enough to compromise the accuracy of these methods.
 
 Furthermore, a shared characteristic of these methods is that the information from the experimental design is considered only during DE testing, not during normalization.
 Including design information may improve normalization accuracy, particularly when there is systematic biological variation between groups of samples.
-For example, samples belonging to the same experimental unit are likely to have similar expression profiles, while samples from different units often exhibit systematic differences.
+For example, samples belonging to the same experimental unit are likely to have similar expression profiles, while samples from different units often have systematic differences.
 This suggests that normalization could be improved by accounting for the biological variation between samples due to the experimental design.
 Motivated by this, we propose \textbf{d}esign-\textbf{i}nformed \textbf{size} factor estimation (\texttt{disize}), which explicitly models both biology and batch effects by directly incorporating the experimental design during estimation.
 We evaluate our method in both bulk and single-cell workflows to show its robustness across bulk and pseudo-bulk contexts.
@@ -290,7 +290,7 @@ Therefore, we additionally suggest a mechanistically justified DGP for RNA-seq e
 
 We begin the construction of the DGP for RNA-seq data by considering the steady-state distribution of transcript counts of single cells within a homogeneous cell population.
 Let $c \in \mathcal{C}$ index a cell, $g \in \mathcal{G}$ index a gene, and $X_{c,g}$ denote the number of transcripts of gene $g$ for cell $c$.
-We assign a negative binomial (NB) distribution to $X_{c,g}$ based on the model of transcription examined in \cite{corrigan_continuum_2016}, where the steady-state distribution of transcript counts is well described by a NB fit:
+We assign a negative binomial (NB) distribution to $X_{c,g}$ based on the model of transcription examined in \cite{corriganContinuumModelTranscriptional2016}, where the steady-state distribution of transcript counts is well described by a NB fit:
 
 \begin{align*}
     X_{c,g} \sim \text{NegBinom}(\eta_g, \phi_g)
@@ -310,7 +310,7 @@ However, in bulk experiments (or single-cell experiments where pseudo-bulking is
     X_g \sim \text{NegBinom}(n_{\mathcal{C}} \eta_g, n_{\mathcal{C}} \phi_g)
 \end{align}
 where $n_{\mathcal{C}} = |\mathcal{C}|$.
-With the use of unique molecular identifiers (UMIs), the effect of library preparation and sequencing on the measured count was found to be well approximated by a binomial thinning \cite{kella_binomial_2023} of the original number of transcript counts \cite{schwabe_relation_2022}. 
+With the use of unique molecular identifiers (UMIs), the effect of library preparation and sequencing on the measured count has previously been modelled by a binomial thinning operation \cite{kellaBinomialThinningMixing2023} on the original number of transcript counts \cite{schwabeRelationInputOutput2022}. 
 In other words, given $X_g$, the total technical effect $\rho$ stochastically scales down the original number of transcripts:
 
 \begin{align}
@@ -348,7 +348,7 @@ Since the size factors $\boldsymbol{s}$ are unobserved (and thus different from 
 This problem is overcome by constraining $\boldsymbol{s}$ to sum to the total number of batches, and assuming only a subset of features are affected by the covariates measured in the experiment. 
 In other words, the estimated coefficients $\boldsymbol{\beta}_g, \boldsymbol{b}_g$ (excluding the intercept) are \textit{sparse} across genes.
 
-We encode this assumption by placing separate horseshoe priors \cite{carvalho_handling_2009} on each of the model coefficients.
+We encode this assumption by placing separate horseshoe priors \cite{carvalhoHandlingSparsityHorseshoe2009} on each of the model coefficients.
 This structure allows different degrees of sparsity for each predictor:
 
 \begin{subequations}
@@ -366,6 +366,7 @@ This structure allows different degrees of sparsity for each predictor:
 where $p$ indexes the fixed-effect coefficients, $k$ indexes the random-effect coefficients, $j$ indexes distinct random-effect terms, and $\boldsymbol{r}$ denotes the term membership structure for the random-effect coefficients.
 
 The Stan implementation splits the data and parameter matrices into chunks gene-wise in order to evaluate all distribution statements in parallel.
+The source code for \texttt{disize} is available at https://github.com/toddpocuca/disize, archived at Zenodo \cite{pocucaToddpocucaDisizeV1002026}."
 
 \subsection*{Simulation Framework}
 
@@ -401,7 +402,7 @@ While parametric simulations allow for the generation of synthetic RNA-seq count
 Conversely, transcriptomic datasets featuring both complex experimental designs and ground-truth size factors are exceedingly rare. 
 To bridge this gap, we use single-sample single-cell RNA sequencing (scRNA-seq) datasets to construct pseudo-bulk RNA-seq data with pre-defined size factors through a simulated pooling strategy. 
 By artificially partitioning cells from the same sample into distinct groups, we can mimic multi-batch experimental layouts while preserving any unspecified variation in the original data.
-Similar frameworks using binomial thinning have previously been implemented to evaluate differential expression testing in both bulk and single-cell workflows \cite{gerard_data-based_2020}.
+Similar frameworks using binomial thinning have previously been implemented to evaluate differential expression testing in both bulk and single-cell workflows \cite{gerardDatabasedRNAseqSimulations2020}.
 
 Given a scRNA-seq count matrix of a single sample, cells within each annotated cell-type cluster are randomly assigned to one of $n_B$ batches. 
 For each distinct combination of cluster $k$ and batch $b$, a pseudo-bulk expression profile is generated by summing the counts across all assigned cells. 
@@ -438,8 +439,8 @@ and fixed the magnitude of covariate effects (\verb|mgt|, $\sigma$) to capture b
 Specifically, we analyzed a trivial baseline design with non-systematic variation and no active condition contrasts across 8 donors (a random-intercept-only design), a standard two-condition design with 10 total donors split equally between two groups (5 replicates per condition), and a multi-factorial design crossing two conditions and sex in a $2 \times 2$ factorial structure using 12 total donors (3 replicates per experimental unit).
 
 In the trivial experimental scenario with no systematic variation, size factor estimation accuracy was largely comparable across all three methods (S1 Fig).
-However, in experiments featuring systematic biological variation, \texttt{disize} demonstrated a clear advantage, proving robust to low sparsity and large biological variation. 
-Specifically, in low-sparsity environments where the majority of genes (80\%, $p=0.2$) exhibited differential expression, MoR and TMM estimates degraded significantly relative to \texttt{disize} even with a high average baseline expression level (\hyperref[fig:1]{Fig~1}, S2 and S3 Figs). 
+However, in experiments featuring systematic biological variation, \texttt{disize} showed a clear advantage, proving robust to low sparsity and large biological variation. 
+Specifically, in low-sparsity environments where the majority of genes (80\%, $p=0.2$) were truly differentially expressed, MoR and TMM estimates degraded significantly relative to \texttt{disize} even with a high average baseline expression level (\hyperref[fig:1]{Fig~1}, S2 and S3 Figs). 
 This advantage was most pronounced in challenging settings with low average baseline expression levels ($< 50$ counts).
 
 % Place figure captions after the first paragraph in which they are cited.
@@ -474,13 +475,13 @@ As expected, using the true simulated baseline batch effects yielded the lowest 
 \end{figure}
 
 \subsection*{Validation With Bulk RNA-seq Using SEQC Data}
-To evaluate \texttt{disize} on bulk transcriptomic data with large-scale expression changes, we used the Sequencing Quality Control (SEQC) consortium benchmark dataset to compare sample A (Universal Human Reference RNA) and sample B (Human Brain Reference RNA) \cite{su_comprehensive_2014}. To replicate typical experiments where spike-ins are absent, we omitted all ERCC features during size factor estimation.
+To evaluate \texttt{disize} on bulk transcriptomic data with large-scale expression changes, we used the Sequencing Quality Control (SEQC) consortium benchmark dataset to compare sample A (Universal Human Reference RNA) and sample B (Human Brain Reference RNA) \cite{suComprehensiveAssessmentRNAseq2014}. To replicate typical experiments where spike-ins are absent, we omitted all ERCC features during size factor estimation.
 
 For \texttt{disize}, the experimental design included sample type as a fixed effect, and batch membership was defined as the interaction of sample type, replicate, and sequencing flowcell. 
 We then performed differential expression testing with \verb|DESeq2| to evaluate the contrast between samples A and B. 
 Significant differentially expressed genes (DEGs) for each method were identified using a threshold of $p_{\text{adj}} < 0.05$ and $|\text{log}_2\ \text{fold change}| > 1$. 
 To validate the ability of each method to recover DEGs, we compared these results to independent ground-truth measurements from high-throughput TaqMan quantitative RT-PCR (qRT-PCR) assays, where true DEGs were defined by an absolute expression difference greater than 1.
-The benchmark demonstrates that \texttt{disize} is comparable to standard bulk normalization methods, recovering a slightly larger pool of validated DEGs than MoR and TMM (\hyperref[fig:3]{Fig~3}). 
+Our benchmark shows that \texttt{disize} is comparable to standard bulk normalization methods, recovering a slightly larger pool of validated DEGs than MoR and TMM (\hyperref[fig:3]{Fig~3}). 
 
 \begin{figure}[H]
 \centering
@@ -493,15 +494,15 @@ The benchmark demonstrates that \texttt{disize} is comparable to standard bulk n
 \end{figure}
 
 \subsection*{Validation With Pseudo-bulk RNA-seq Data}
-To evaluate whether the performance advantages of \texttt{disize} persist when confronted with realistic count data, we tested each normalization method on pseudo-bulk data derived from a scRNA-seq dataset. We leveraged a publicly available 10x Genomics dataset consisting of 10,000 Peripheral Blood Mononuclear Cells (PBMCs) \cite{10x_genomics_10k_2020}.
+To evaluate whether the performance advantages of \texttt{disize} persist when confronted with realistic count data, we tested each normalization method on pseudo-bulk data derived from a scRNA-seq dataset. We used a publicly available 10x Genomics dataset consisting of 10,000 Peripheral Blood Mononuclear Cells (PBMCs) \cite{10xgenomics10kPeripheralBlood2020}.
 Using the pre-annotated cell-type clusters as distinct biological conditions, we randomly partitioned the cells within each cluster into five batches and performed pseudo-bulking to generate expression profiles for each batch-cluster combination. 
 We next used DESeq2 to perform differential expression analysis on the pseudo-bulk data where no batch effects are present, and then imposed ground-truth size factors on the expression profiles per-batch through binomial thinning. 
 We then benchmarked how well each normalization method recovered the true size factors, the original $\text{log}_2$ fold-changes, and any genes identified as DE (defined as $p_{\text{adj}} < 0.05$ and $|\text{log}_2\ \text{fold change}| > 1$).
 
 The pseudo-bulk evaluation closely mirrors the trends observed in our parametric simulations. 
-Both MoR and TMM exhibited higher relative errors in their size factor estimates compared to \texttt{disize} (\hyperref[fig:4]{Fig~4}). 
+Both MoR and TMM had higher relative errors in their size factor estimates compared to \texttt{disize} (\hyperref[fig:4]{Fig~4}). 
 The error in size factor accuracy directly translated to the accuracy of downstream differential expression testing. 
-When evaluating downstream effects, \texttt{disize} demonstrated a lower error in $\text{log}_2$ fold-change estimates (\hyperref[fig:5]{Fig~5A}) as well as a lower Type II error rate (\hyperref[fig:5]{Fig~5B}) compared to both MoR and TMM.
+When evaluating downstream effects, \texttt{disize} had a lower error in $\text{log}_2$ fold-change estimates (\hyperref[fig:5]{Fig~5A}) as well as a lower Type II error rate (\hyperref[fig:5]{Fig~5B}) compared to both MoR and TMM.
 This confirms that including information from cell-type annotations during normalization allows \texttt{disize} to accurately isolate batch effects in pseudo-bulk data.
 
 \begin{figure}[H]
@@ -528,7 +529,7 @@ This confirms that including information from cell-type annotations during norma
 
 \subsection*{A Case Study of scRNA-seq Data From Interferon-$\beta$ Stimulated PBMCs}
 
-To evaluate its utility on multi-donor single-cell experiments, we applied \texttt{disize} to a scRNA-seq dataset of human PBMCs stimulated with interferon-beta (IFN-$\beta$) or left untreated as controls \cite{kang_multiplexed_2018}.
+To evaluate its utility on multi-donor single-cell experiments, we applied \texttt{disize} to a scRNA-seq dataset of human PBMCs stimulated with interferon-beta (IFN-$\beta$) or left untreated as controls \cite{kangMultiplexedDropletSinglecell2018}.
 We aggregated the counts into pseudo-bulk profiles stratified by experimental condition, donor identity, and cell-type annotation, yielding a multi-factorial experimental design with a varying number of cells contributing to each pseudo-bulk sample. 
 We then estimated size factors for each sample, where \texttt{disize} was supplied the experimental design with an interaction between the condition and cell-type annotation, and the log-transformed number of cells contributing to each pseudo-bulk sample as offsets.
 
@@ -538,7 +539,7 @@ Significant DEGs were identified using a threshold of $p_{\text{adj}} < 0.05$ an
 Across the majority of the 13 cell types, \texttt{disize} consistently identified a larger number of significant DEGs compared to MoR and TMM (\hyperref[fig:6]{Fig~6}). 
 Notably, this trend was most pronounced in CD14+ monocytes, which yielded the highest absolute number of DEGs discovered by \texttt{disize} (\hyperref[fig:7]{Fig~7}).
 Specifically, \texttt{disize} uniquely resolved the significant downregulation of the oxysterol receptor \textit{GPR183} (EBI2) in CD14+ monocytes. 
-This matches established myeloid feedback mechanisms, where the type I interferon axis and \textit{GPR183} mutually cross-regulate to dictate monocyte activation and trafficking during inflammatory stress \cite{bartlett_gpr183_2020}.
+This matches established myeloid feedback mechanisms, where the type I interferon axis and \textit{GPR183} mutually cross-regulate to dictate monocyte activation and trafficking during inflammatory stress \cite{bartlettGPR183RegulatesInterferons2020}.
 The increased sensitivity relative to other normalization methods indicates that \texttt{disize} is particularly useful for scRNA-seq experiments. 
 
 
@@ -569,26 +570,44 @@ We address this gap by proposing a novel normalization method that explicitly le
 
 Our benchmarking demonstrates that \texttt{disize} works well under various scenarios, particularly those with non-trivial biological variation across experimental units, low sparsity (i.e., a high proportion of DE genes), and many genes with low expression.
 This makes \texttt{disize} particularly well suited for scRNA-seq experiments, where the biological differences between cell types result in little sparsity and pseudo-bulking (aggregating counts from multiple cells into a single ``sample'') may not accumulate enough counts for standard methods to work effectively.
-Indeed, \texttt{disize} greatly outperformed both MoR and TMM in our pseudo-bulk evaluation and recovered more DEGs than MoR and TMM in the case study of IFN-$\beta$ stimulated PBMCs, demonstrating that our method successfully leverages information in cell-type annotations to improve size factor estimation.
+Indeed, \texttt{disize} greatly outperformed both MoR and TMM in our pseudo-bulk evaluation and recovered more DEGs than MoR and TMM in the case study of IFN-$\beta$ stimulated PBMCs, showing our method successfully leverages information in cell-type annotations to improve size factor estimation.
 
 Although the Type II error rates were comparable across methods in the parametric simulation benchmarks, since \texttt{disize} had the lowest Type I error rate---often below the nominal $\alpha = 0.05$ for low baseline expression---there is potential for increasing the specified significance threshold to produce a lower Type II error rate while retaining a Type I error below the desired $\alpha$.
 In simpler experiments, however, MoR normalization is roughly as accurate as \texttt{disize} when most genes have sufficient expression ($> 100$ counts) and large systematic biological variation is unlikely.
 
-Previous benchmarks of normalization methods \cite{robinson_scaling_2010, li_choice_2020} have simulated data by drawing from a multinomial distribution, where the total number of trials represents the library size and a specified vector of probabilities defines the gene expression profile. 
+Previous benchmarks of normalization methods \cite{robinsonScalingNormalizationMethod2010,liChoiceLibrarySize2020} have simulated data by drawing from a multinomial distribution, where the total number of trials represents the library size and a specified vector of probabilities defines the gene expression profile. 
 While this approach is convenient, it fails to account for the overdispersion present in RNA-seq data and lacks a realistic mechanism describing how sample preparation and sequencing imperfectly measure the true number of transcripts resulting in the observed count.
 We offer an alternative DGP that explicitly models the original magnitude of gene expression and the total effect of technical factors on the observed count distribution.
 
 Since \texttt{disize} jointly estimates the effect of covariates on gene expression and the batch effect, performing inference on the full model may be useful to combine normalization and differential expression quantification into a single step.
 Currently, we discard the point estimates for the covariate coefficients specified by the experimental design, and do not quantify uncertainty for any parameters.
-Although the model is complex to fit due to the large number of features in transcriptomic experiments, variational inference methods could approximate the posterior distribution efficiently \cite{blei_variational_2017}. 
+Although the model is complex to fit due to the large number of features in transcriptomic experiments, variational inference methods could approximate the posterior distribution efficiently \cite{bleiVariationalInferenceReview2017}. 
 This full model would enable differential expression analysis without an explicit normalization step and would quantify uncertainty in size factor estimates.
 
 Although this work has focused on bulk and pseudo-bulk scenarios, since \texttt{disize} allows for an arbitrary batch membership structure, normalization could be done directly on unaggregated scRNA-seq data. 
 This approach leverages the fact that cells belonging to the same sample share a batch effect (avoiding the need for offsets when pseudo-bulking). 
-Consequently, using \texttt{disize} with tools specifically developed for DE testing in single-cell experiments (such as glmGamPoi \cite{ahlmann-eltze_glmgampoi_2021}) a pseudo-bulking step could be avoided altogether. 
+Consequently, using \texttt{disize} with tools specifically developed for DE testing in single-cell experiments (such as glmGamPoi \cite{ahlmann-eltzeGlmGamPoiFittingGammaPoisson2021}) a pseudo-bulking step could be avoided altogether. 
 However, an issue with the current implementation is that \texttt{disize} represents the count matrix in a dense format, which increases the memory footprint and may preclude its use with large datasets. 
 Future work could allow a sparse representation, which would significantly reduce the memory requirements.
 
+\section*{Acknowledgments}
+
+\nolinenumbers
+
+% Please compile your BiBTeX database using the "plos2025.bst" BibTeX style.
+% This file is part of the current package.
+% A sample BibTeX file is also included as "plos_bibtex_sample.bib".
+%
+% or
+%
+% Type in your references following Vancouver style and reference formatting instructions
+% available at https://journals.plos.org/plosone/s/submission-guidelines#loc-references
+% \begin{thebibliography}{}
+% \bibitem{}
+% Text
+% \end{thebibliography}
+
+\bibliography{disize}
 
 \section*{Supporting information}
 
@@ -635,25 +654,6 @@ Values close to 1 are better.
 Fixing $\alpha = 0.05$, $n_g = 10000$, $\sigma = 2$, and varying $p$, type 2 error rates of each normalization method (disize, MoR, and TMM) to the ground truth batch effect versus the average baseline gene expression level.
 Values close to 1 are better.
 \end{figure}
-
-\section*{Acknowledgments}
-
-\nolinenumbers
-
-% Please compile your BiBTeX database using the "plos2025.bst" BibTeX style.
-% This file is part of the current package.
-% A sample BibTeX file is also included as "plos_bibtex_sample.bib".
-%
-% or
-%
-% Type in your references following Vancouver style and reference formatting instructions
-% available at https://journals.plos.org/plosone/s/submission-guidelines#loc-references
-% \begin{thebibliography}{}
-% \bibitem{}
-% Text
-% \end{thebibliography}
-
-\bibliography{disize}
 
 \end{document}
 
