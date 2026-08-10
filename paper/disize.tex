@@ -366,7 +366,7 @@ This structure allows different degrees of sparsity for each predictor:
 where $p$ indexes the fixed-effect coefficients, $k$ indexes the random-effect coefficients, $j$ indexes distinct random-effect terms, and $\boldsymbol{r}$ denotes the term membership structure for the random-effect coefficients.
 
 The Stan implementation splits the data and parameter matrices into chunks gene-wise in order to evaluate all distribution statements in parallel.
-The source code for \texttt{disize} is available at https://github.com/toddpocuca/disize, archived at Zenodo \cite{pocucaToddpocucaDisizeV1002026}."
+The source code for \texttt{disize} is available at https://github.com/toddpocuca/disize, archived at Zenodo \cite{pocucaToddpocucaDisizeV1012026}."
 
 \subsection*{Simulation Framework}
 
@@ -644,7 +644,6 @@ A lower relative error indicates a more accurate size factor estimate.
 \paragraph*{S4 Fig.}
 \textbf{Comparing normalization methods for Type 1 error rates in a two-group design.}
 Fixing $\alpha = 0.05$, $n_g = 10000$, $\sigma = 2$, and varying $p$, type 1 error rates of each normalization method (disize, MoR, and TMM) to the ground truth batch effect versus the average baseline gene expression level.
-Values close to 1 are better.
 \end{figure}
 
 \begin{figure}[!ht]
@@ -652,7 +651,6 @@ Values close to 1 are better.
 \paragraph*{S5 Fig.}
 \textbf{Comparing normalization methods for Type 2 error rates in a two-group design.}
 Fixing $\alpha = 0.05$, $n_g = 10000$, $\sigma = 2$, and varying $p$, type 2 error rates of each normalization method (disize, MoR, and TMM) to the ground truth batch effect versus the average baseline gene expression level.
-Values close to 1 are better.
 \end{figure}
 
 \end{document}
